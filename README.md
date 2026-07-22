@@ -25,6 +25,8 @@ favorita-demand-forecasting/
 │   └── results/
 ├── src/
 │   ├── __init__.py
+│   ├── comtradeapi-data.py     # Pulls data from UN Comtrade
+│   └── data-cleaning.py        # Process raw data + build nodes and edges
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -47,4 +49,5 @@ Once all of those steps are complete, run the code as follows:
 ```
 pip install -r requirements.txt
 python3 src/comtradeapi-data.py
+python3 src/data-cleaning.py
 ```
