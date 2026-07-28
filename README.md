@@ -48,6 +48,6 @@ Once all of those steps are complete, run the code as follows:
 
 ```
 pip install -r requirements.txt
-python3 src/comtradeapi-data.py
-python3 src/data-cleaning.py data/raw/comtrade_gallium_imports_2025_raw.csv
+python3 src/comtradeapi_data.py
+python3 src/data_cleaning.py data/raw/comtrade_gallium_imports_2025_raw.csv
 ```
