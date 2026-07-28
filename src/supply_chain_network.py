@@ -5,7 +5,7 @@ to be called repeatedl by an LLM as a tool."""
 
 import difflib
 
-from types import Any
+from typing import Any
 
 import networkx as nx
 import pandas as pd
