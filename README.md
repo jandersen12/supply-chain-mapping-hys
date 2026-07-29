@@ -6,7 +6,8 @@ A graph database solution to supply chain analytics and strategic solutions for 
 
 Supply chains have prioritized efficiency and lower upfront costs at the expense of network resilience. This has resulted in supply chain systems that lack the flexibility to respond to global shocks, often leading to inflation and logistical challenges that can take months or years to recover. By creating digital graph database models of commodity supply chains, companies can surface chokepoints in the system and create plans that enable them to respond to shocks with strategic solutions that limit negative impacts. 
 
-This project aims to model the supply chain network for a single commodity and surface chokepoints its chokepoints. By leveraging graph algorithms and optimization libraries in python, the project analysis will produce insights into the cost of reallocating resources to respond to supply chain failures. Finally, there will be a natural langauge interface that a user can interact with to model potential scenarios. The natural language inerface will translate the scenario into model inputs and then translate the result back into natural langauge for the user, enabling businesses to translate "what-if" scenarios into action plans for resilience. 
+This project models the supply chain network for a single commodity to identify critical nodes where failures in the chain would be the most disruptive. Using graph algorithms and optimization techniques, it estimates the cost of rerouting resources when a failure occurs at one of these points. A natural language interface also lets users simulate "what-if" scenarios, helping businesses turn resilience planning into concrete action.
+
 
 ### Data
 
@@ -20,13 +21,19 @@ favorita-demand-forecasting/
 │   ├── raw/
 │   └── processed/
 ├── notebooks/
+│   ├── eda.ipynb
+│   └── node_removal_analysis.ipynb
 ├── outputs/
 │   ├── figures/
 │   └── results/
 ├── src/
 │   ├── __init__.py
-│   ├── comtradeapi-data.py     # Pulls data from UN Comtrade
-│   └── data-cleaning.py        # Process raw data + build nodes and edges
+│   ├── comtradeapi_data.py     # Pulls data from UN Comtrade
+│   ├── data_cleaning.py        # Process raw data + build nodes and edges
+│   ├── supply_chain_network.py # Builds network, calculates key metrics
+│   └── tool_schemas.py         # Tool format for LLM calls
+├── tests/
+│   ├── demo.py                 # script to simulate supply_chain_network.py
 ├── .gitignore
 ├── README.md
 └── requirements.txt
