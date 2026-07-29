@@ -35,6 +35,7 @@ favorita-demand-forecasting/
 ├── tests/
 │   ├── demo.py                 # script to simulate supply_chain_network.py
 ├── .gitignore
+├── app.py                      # streamlit interface
 ├── README.md
 └── requirements.txt
 ```
