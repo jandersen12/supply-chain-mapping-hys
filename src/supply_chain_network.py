@@ -30,7 +30,7 @@ class SupplyChainNetwork:
             edges, 
             source="source", 
             target="target", 
-            edge_attr=["trade_value_usd", "trade_qty_kg", "share_of_reporter_total"],
+            edge_attr=["trade_value_usd", "trade_qty_kg", "share_of_reporter_total", "distance_km", "estimated_tariff_pct"],
             create_using=nx.DiGraph()
         )
 
