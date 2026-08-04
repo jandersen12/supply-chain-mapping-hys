@@ -45,7 +45,7 @@ if os.path.exists(OUTPUT_PATH):
     already_pulled = set(df_existing["reporterCode"].unique())
     print("Some reporters already pulled in previous run. Skipping those reporters to avoid duplicates.")
 
-reporter_codes = [c for c in reporter_codes if c not in already_pulled]
+    reporter_codes = [c for c in reporter_codes if c not in already_pulled]
 
 # --- Build params ---
 # HTML pattern: https://comtradeapi.un.org/data/v1/get/{typeCode}/{freqCode}/{clCode}
