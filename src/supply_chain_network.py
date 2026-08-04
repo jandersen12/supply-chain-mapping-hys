@@ -13,6 +13,7 @@ from typing import Any
 import networkx as nx
 import pandas as pd
 
+from .estimate_lead_times import estimate_lead_time_days
 from .estimate_tariffs import derive_importer_default_rates, estimate_tariff_pct
 
 class SupplyChainNetwork:
@@ -193,7 +194,13 @@ class SupplyChainNetwork:
             },
         }
 
-    def find_rerouting_options(self, removed_countries: list[str], capacity_multiplier: float = 1.0) -> dict[str, Any]:
+    def find_rerouting_options(
+        self,
+        removed_countries: list[str],
+        capacity_multiplier: float = 0.3,
+        onboarding_cost_multiplier: float = 0.0,
+        onboarding_lead_time_days: float = 45.0,
+    ) -> dict[str, Any]:
         """
         For each importer that sourced this commodity from a country being removed,
         find the best replacement supplier(s) among the remaining network.
@@ -205,6 +212,21 @@ class SupplyChainNetwork:
         estimated_tariff_pct is used; otherwise a tariff is estimated with the
         same rule engine that produced estimated_tariffs.csv (see
         estimate_tariffs.py) and flagged as such.
+
+        Forming a brand-new supplier relationship carries real-world friction
+        (vendor qualification, contracting, first-shipment setup) that an
+        existing relationship doesn't. Two separate levers model this rather
+        than one, since cost and time are different currencies and shouldn't
+        be silently combined:
+          - onboarding_cost_multiplier inflates a new candidate's landed unit
+            cost by this fraction, same toggle pattern as capacity_multiplier.
+            0.0 (default) disables it.
+          - onboarding_lead_time_days is added to a new candidate's estimated
+            lead time (see estimate_lead_times.py). It's reported per
+            allocation but does not affect ranking/cost - lead time isn't
+            folded into the dollar objective here to avoid stacking an
+            invented $/day conversion on top of the tariff and onboarding-cost
+            placeholders already in play.
 
         Candidates are capacity-constrained: each can absorb up to
         capacity_multiplier times its current total export value in
@@ -221,14 +243,21 @@ class SupplyChainNetwork:
                 an export ban) - same semantics as simulate_removal.
             capacity_multiplier: how much additional trade value, as a
                 multiple of a candidate's current total exports, it can
-                absorb. Default 1.0 means a candidate can at most double its
-                current export value.
+                absorb. Default 0.3 means a candidate can at most absorb 30%
+                of its current export value in additional rerouted trade (short stock assumption).
+            onboarding_cost_multiplier: fractional landed-cost penalty applied
+                to candidates that aren't an existing supplier for the
+                importer. Default 0.0 (no penalty).
+            onboarding_lead_time_days: additional estimated lead-time days for
+                a new relationship, on top of the distance-based baseline.
+                Reported only, not used for ranking.
 
         Returns:
             A JSON-serializable dict. If a failure occurs, 'success' = False
             and 'error' explains what went wrong. If successful, returns, per
             displaced import relationship, the chosen replacement supplier(s),
-            landed cost, and any unmet shortfall, plus an overall summary.
+            landed cost, estimated lead time, and any unmet shortfall, plus an
+            overall summary.
         """
 
         if not removed_countries:
@@ -328,13 +357,22 @@ class SupplyChainNetwork:
                     is_new_relationship = True
 
                 landed_unit_cost = stats["avg_unit_price_usd_per_kg"] * (1 + tariff_pct)
+                if is_new_relationship:
+                    landed_unit_cost *= (1 + onboarding_cost_multiplier)
+
+                distance_km = self._distance_km(importer, candidate)
+                lead_time = estimate_lead_time_days(
+                    distance_km, is_new_relationship, onboarding_lead_time_days
+                )
+
                 ranked.append({
                     "candidate": candidate,
                     "landed_unit_cost_usd_per_kg": landed_unit_cost,
                     "tariff_pct": tariff_pct,
                     "tariff_methodology": tariff_methodology,
                     "is_new_trade_relationship": is_new_relationship,
-                    "distance_km": self._distance_km(importer, candidate),
+                    "distance_km": distance_km,
+                    "est_supplier_lead_time_days": lead_time["est_supplier_lead_time_days"],
                 })
             ranked.sort(key=lambda c: c["landed_unit_cost_usd_per_kg"])
 
@@ -362,6 +400,7 @@ class SupplyChainNetwork:
                     "tariff_methodology": candidate_info["tariff_methodology"],
                     "is_new_trade_relationship": candidate_info["is_new_trade_relationship"],
                     "distance_km": round(candidate_info["distance_km"], 1) if candidate_info["distance_km"] is not None else None,
+                    "est_supplier_lead_time_days": candidate_info["est_supplier_lead_time_days"],
                 })
 
             unmet_value = round(remaining_to_allocate, 2)
@@ -380,7 +419,12 @@ class SupplyChainNetwork:
         return {
             "success": True,
             "error": None,
-            "scenario": {"removed_countries": resolved, "capacity_multiplier": capacity_multiplier},
+            "scenario": {
+                "removed_countries": resolved,
+                "capacity_multiplier": capacity_multiplier,
+                "onboarding_cost_multiplier": onboarding_cost_multiplier,
+                "onboarding_lead_time_days": onboarding_lead_time_days,
+            },
             "reroutes": reroutes,
             "summary": {
                 "n_displaced_relationships": len(displaced),

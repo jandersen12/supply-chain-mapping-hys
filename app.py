@@ -75,12 +75,18 @@ def build_reroute_viz(g_after, layout, reroutes, height="600px"):
         for alloc in reroute["allocations"]:
             is_new = alloc["is_new_trade_relationship"]
             distance = f"{alloc['distance_km']:.0f} km" if alloc["distance_km"] is not None else "unknown"
+            lead_time = (
+                f"{alloc['est_supplier_lead_time_days']:.0f} days"
+                if alloc["est_supplier_lead_time_days"] is not None
+                else "unknown"
+            )
             title = (
                 f"Rerouted: {importer} <- {alloc['new_supplier']}<br>"
                 f"${alloc['allocated_value_usd']:,.0f} allocated<br>"
                 f"Landed cost: ${alloc['landed_unit_cost_usd_per_kg']:.2f}/kg<br>"
                 f"Tariff: {alloc['tariff_pct'] * 100:.1f}% ({alloc['tariff_methodology']})<br>"
                 f"Distance: {distance}<br>"
+                f"Est. lead time: {lead_time}<br>"
                 f"{'New trade relationship' if is_new else 'Existing trade relationship, increased volume'}"
             )
             net.add_edge(

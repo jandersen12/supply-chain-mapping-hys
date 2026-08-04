@@ -1,3 +1,4 @@
+absl-py==2.5.0
 appnope==0.1.4
 asttokens==3.0.2
 certifi==2026.6.17
@@ -13,6 +14,7 @@ geopandas==1.0.1
 idna==3.18
 ipykernel==7.3.0
 ipython==9.15.0
+immutabledict==4.3.1
 ipython_pygments_lexers==1.1.1
 jedi==0.20.0
 Jinja2==3.1.6
@@ -28,6 +30,7 @@ narwhals==2.24.0
 nest-asyncio2==1.7.2
 networkx==3.6.1
 numpy==2.5.1
+ortools==9.15.6755
 packaging==26.2
 pandas==3.0.3
 parso==0.8.7
@@ -36,6 +39,7 @@ pillow==12.3.0
 platformdirs==4.10.1
 plotly==6.9.0
 prompt_toolkit==3.0.52
+protobuf==6.33.6
 psutil==7.2.2
 ptyprocess==0.7.0
 pure_eval==0.2.3
