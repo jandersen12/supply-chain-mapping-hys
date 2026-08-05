@@ -35,23 +35,44 @@ def load_raw(paths: list[str]):
     return combined
 
 
-# --- Drop Aggregate Rows --- 
+# --- Drop Aggregate Rows ---
+
+COUNTRY_NAME_FIXES = {"Other Asia, nes": "Taiwan"}      # rename for clarity
+EXCLUDED_ENTITIES = {"European Union"}                  # total for EU duplicate totals for its member states
+
 
 def filter_edges(df: pd.DataFrame):
-    """Keep only bilateral records.
-    Exclude 'World' rows and isAggregate == True rows.
+    """Keep only bilateral records: one row per (reporter, partner) pair.
+
+    Excludes 'World' partner rows, self-trade rows, and rows involving
+    EXCLUDED_ENTITIES, and collapses each remaining pair down to its single
+    totals row.
+
+    UN Comtrade's "plus" breakdownMode fans every bilateral pair out across
+    three extra dimensions:
+        - mode of transport (motCode)
+        - customs procedure (customsCode)
+        - secondary partner (partner2Code)
+    each with its own "TOTAL" value (0, "C00", 0 respectively). Keeping only the row
+    where all three are at that value reduces each pair back down to the
+    one row "classic" mode would have returned, but maintains the disaggregated rows for
+    future use/analysis.
+
+    Classic-mode files trivially satisfy this same condition on every row (those columns are always at
+    their only/TOTAL value there), so this filter is safe regardless of
+    which breakdownMode a file was pulled with.
     """
 
+    df = df.replace({"reporterDesc": COUNTRY_NAME_FIXES, "partnerDesc": COUNTRY_NAME_FIXES})
+
     world_mask = df['partnerDesc'].str.strip().str.lower() == 'world'
-    n_world = world_mask.sum()
-
-    agg_mask = df['isAggregate'] == True
-    n_agg_only = (agg_mask & ~world_mask).sum()
-
     self_mask = df['reporterDesc'] == df['partnerDesc']
-    n_self = self_mask.sum()
+    excluded_mask = df['reporterDesc'].isin(EXCLUDED_ENTITIES) | df['partnerDesc'].isin(EXCLUDED_ENTITIES)
+    totals_mask = (
+        (df['motCode'] == 0) & (df['customsCode'] == 'C00') & (df['partner2Code'] == 0)
+    )
 
-    clean = df[~world_mask & ~agg_mask & ~self_mask].copy()
+    clean = df[~world_mask & ~self_mask & ~excluded_mask & totals_mask].copy()
 
     return clean
 
@@ -145,8 +166,7 @@ def add_tariffs(edges: pd.DataFrame, tariffs: pd.DataFrame) -> pd.DataFrame:
 
     Joined on (source, target). Tariff estimates are currently country-pair level
     (not year/commodity specific), so this assumes at most one tariff row per
-    source-target pair - it warns if that stops being true (e.g. once tariffs
-    become commodity- or year-specific) rather than silently duplicating edges.
+    source-target pair.
     """
 
     dupes = tariffs.duplicated(subset=["source", "target"]).sum()

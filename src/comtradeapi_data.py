@@ -37,7 +37,7 @@ print(f"Sample entry: {reporters_list[0]}")
 reporter_codes = [r["id"] for r in reporters_list]
 
 # --- Output path ---
-OUTPUT_PATH = "data/raw/comtrade_gallium_imports_2025_raw.csv"
+OUTPUT_PATH = "data/raw/comtrade_oil_imports_2024_raw.csv"
 
 # if previous run already wrote data, we can skip those reporters to avoid duplicates
 if os.path.exists(OUTPUT_PATH):
@@ -52,19 +52,24 @@ if os.path.exists(OUTPUT_PATH):
 # Additional filters will be passed as query parameters.
 
 BASE_URL = "https://comtradeapi.un.org/data/v1/get/C/A/HS"
-CMD_CODE = "811292" # Commodity code for unwrought gallium
-PERIOD = "2025"
+CMD_CODE = "2709" # Commodity code for crude oil
+PERIOD = "2024"
 FLOW_CODE = "M" # M for imports
 
 BASE_SLEEP = 2
 MAX_RETRIES = 3
 RATE_LIMIT_BACKOFF = 30
 
+# The API caps a single call at 100k records; flag any reporter that comes
+# nears that threshold and check to make sure they didn't get truncated
+TRUNCATION_WARNING_THRESHOLD = 90_000
+
 
 # --- Loop over reporters and pull data ---
 all_data = []
 failed_reporters = []
 empty_reporters = []
+possibly_truncated_reporters = []
 
 for code in tqdm(reporter_codes, desc="Pulling Comtrade data by reporter"):
 
@@ -73,10 +78,10 @@ for code in tqdm(reporter_codes, desc="Pulling Comtrade data by reporter"):
         "subscription-key": api_key,
         "period": PERIOD,
         "reporterCode": code,
-        "cmdCode": CMD_CODE,                   # Commodity code for unwrought gallium
+        "cmdCode": CMD_CODE,
         "flowCode": FLOW_CODE,                 # M for imports
         "partnerCode": None,                   # None means all partners
-        "breakdownMode": "classic",
+        "breakdownMode": "plus",
         "includeDesc": "true"
     }
 
@@ -94,7 +99,15 @@ for code in tqdm(reporter_codes, desc="Pulling Comtrade data by reporter"):
                 # Incremental save
                 file_exists = os.path.exists(OUTPUT_PATH)
                 df_country.to_csv(OUTPUT_PATH, mode='a', header=not file_exists, index=False)
-                print(f"Successfully pulled data for reporter {code}. Rows: {len(rows)}")
+
+                n_rows = len(rows)
+                if n_rows >= TRUNCATION_WARNING_THRESHOLD:
+                    possibly_truncated_reporters.append((code, n_rows))
+                    tqdm.write(
+                        f"WARNING: reporter {code} returned {n_rows:,} rows, near the "
+                        "100k/call cap - this reporter's data may be truncated."
+                    )
+                print(f"Successfully pulled data for reporter {code}. Rows: {n_rows}")
             else:
                 empty_reporters.append(code)
             
@@ -131,6 +144,7 @@ for code in tqdm(reporter_codes, desc="Pulling Comtrade data by reporter"):
 print(f"\nTotal reporters processed: {len(reporter_codes)}")
 print(f"Total reporters failed: {len(failed_reporters)}")
 print(f"Total reporters with no data: {len(empty_reporters)}")
+print(f"Total reporters near the 100k/call cap (possibly truncated): {len(possibly_truncated_reporters)}")
 if failed_reporters:
     print("Failed reporters:")
     for code, error in failed_reporters:
@@ -140,3 +154,8 @@ if empty_reporters:
     print("Empty reporters:")
     for code in empty_reporters:
         print(f"Reporter {code}: No data available")
+
+if possibly_truncated_reporters:
+    print("Reporters near the 100k/call cap - verify these aren't missing rows:")
+    for code, n_rows in possibly_truncated_reporters:
+        print(f"Reporter {code}: {n_rows:,} rows")
