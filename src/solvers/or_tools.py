@@ -18,6 +18,8 @@ integer/binary variables would only be needed if a future extension added
 discrete choices (e.g. "use at most N new suppliers").
 """
 
+import math
+
 from ortools.linear_solver import pywraplp
 
 from .compare import SolverResult
@@ -81,9 +83,14 @@ def solve(problem: RerouteProblem) -> SolverResult:
 
     arc_rows = list(problem.arcs.itertuples(index=False))
 
-    # One decision variable per feasible (importer, candidate) arc.
+    # One decision variable per feasible (importer, candidate) arc, upper-bounded
+    # by max_alloc_usd where finite (diversification's per-candidate share cap).
     x = {
-        (row.importer, row.candidate): solver.NumVar(0, solver.infinity(), f"x_{row.importer}_{row.candidate}")
+        (row.importer, row.candidate): solver.NumVar(
+            0,
+            row.max_alloc_usd if math.isfinite(row.max_alloc_usd) else solver.infinity(),
+            f"x_{row.importer}_{row.candidate}",
+        )
         for row in arc_rows
     }
     unmet = {
