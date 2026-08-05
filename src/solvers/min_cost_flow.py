@@ -84,12 +84,7 @@ def solve(problem: RerouteProblem) -> SolverResult:
         if supplier_node not in G:
             continue  # candidate had no supply capacity (shouldn't happen, but stay safe)
         cost = round(row.unit_cost_usd_per_kg * COST_SCALE)
-        edge_kwargs = {"weight": cost}
-        if math.isfinite(row.max_alloc_usd):
-            # Diversification's per-candidate share cap - default (no attr) is
-            # unbounded capacity, which is what build_reroute_problem needs.
-            edge_kwargs["capacity"] = round(row.max_alloc_usd * VALUE_SCALE)
-        G.add_edge(supplier_node, importer_node, **edge_kwargs)
+        G.add_edge(supplier_node, importer_node, weight=cost)
 
     try:
         _, flow_dict = nx.network_simplex(G)

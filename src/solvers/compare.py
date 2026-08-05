@@ -141,18 +141,9 @@ def run_comparison(
     if not built["success"]:
         raise ValueError(f"Could not build problem: {built.get('error')}")
 
-    return run_comparison_on_problem(built["problem"], solvers)
+    problem = built["problem"]
 
-
-def run_all_solvers(problem: RerouteProblem, solvers: dict[str, SolverFn]) -> dict[str, SolverResult]:
-    """Run every solver in `solvers` against an already-built RerouteProblem,
-    returning the full SolverResult per solver (including allocations) rather
-    than just the summary row run_comparison_on_problem reports. A failing
-    solver (missing dependency, infeasible problem, exception) shows up as a
-    SolverResult with success=False rather than raising.
-    """
-
-    results = {}
+    rows = []
     for name, solver_fn in solvers.items():
         start = time.perf_counter()
         try:
@@ -165,25 +156,7 @@ def run_all_solvers(problem: RerouteProblem, solvers: dict[str, SolverFn]) -> di
                 error=str(e),
                 runtime_seconds=round(time.perf_counter() - start, 4),
             )
-        results[name] = result
-
-    return results
-
-
-def run_comparison_on_problem(problem: RerouteProblem, solvers: dict[str, SolverFn]) -> pd.DataFrame:
-    """Run every solver in `solvers` against an already-built RerouteProblem.
-
-    Extracted from run_comparison so any caller with its own RerouteProblem
-    (e.g. a diversification/rebalancing problem, not just a removal scenario)
-    can reuse the same solver-comparison harness without needing a
-    removed_countries list to build one via build_reroute_problem.
-
-    Returns: same shape as run_comparison - one row per solver.
-    """
-
-    results = run_all_solvers(problem, solvers)
-    rows = [
-        {
+        rows.append({
             "solver": name,
             "success": result.success,
             "objective_value": result.objective_value,
@@ -192,8 +165,6 @@ def run_comparison_on_problem(problem: RerouteProblem, solvers: dict[str, Solver
             "n_new_relationships": result.n_new_relationships,
             "runtime_seconds": result.runtime_seconds,
             "error": result.error,
-        }
-        for name, result in results.items()
-    ]
+        })
 
     return pd.DataFrame(rows)
