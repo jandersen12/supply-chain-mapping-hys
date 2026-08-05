@@ -66,7 +66,7 @@ def _greedy_adapter(problem: RerouteProblem, network: "SupplyChainNetwork") -> S
     """
 
     result = network.find_rerouting_options(
-        problem.scenario["removed_countries"],
+        {s["country"]: s["severity"] for s in problem.scenario["shocks"]},
         capacity_multiplier=problem.scenario["capacity_multiplier"],
         onboarding_cost_multiplier=problem.scenario["onboarding_cost_multiplier"],
         onboarding_lead_time_days=problem.scenario["onboarding_lead_time_days"],
@@ -104,7 +104,7 @@ def greedy_solver(network: "SupplyChainNetwork") -> SolverFn:
 
 def run_comparison(
     network: "SupplyChainNetwork",
-    removed_countries: list[str],
+    shocks: dict[str, float],
     solvers: dict[str, SolverFn],
     capacity_multiplier: float = 0.3,
     onboarding_cost_multiplier: float = 0.0,
@@ -114,8 +114,7 @@ def run_comparison(
 
     Args:
         network: loaded SupplyChainNetwork.
-        removed_countries: scenario input, same semantics as
-            find_rerouting_options.
+        shocks: scenario input, same semantics as find_rerouting_options.
         solvers: name -> solve(problem) -> SolverResult. Register new solvers
             here as they're built; include greedy_solver(network) as the
             baseline.
@@ -133,7 +132,7 @@ def run_comparison(
 
     built = build_reroute_problem(
         network,
-        removed_countries,
+        shocks,
         capacity_multiplier=capacity_multiplier,
         onboarding_cost_multiplier=onboarding_cost_multiplier,
         onboarding_lead_time_days=onboarding_lead_time_days,

@@ -1,6 +1,6 @@
 """Core supply chain graph service.
 
-Loads the cleaned trade network once and exposes a scenario-simulation method ('simulate_removal') designed
+Loads the cleaned trade network once and exposes a scenario-simulation method ('simulate_shock') designed
 to be called repeatedl by an LLM as a tool."""
 
 import difflib
@@ -25,7 +25,7 @@ class SupplyChainNetwork:
             edges_path = "data/processed/cleaned_edges.csv",
             nodes_path = "data/processed/cleaned_nodes.csv"
         )
-        result = network.simulate_removal(["USA"])
+        result = network.simulate_shock({"USA": 1.0})
     """
 
     def __init__(self, edges_path: str, nodes_path: str, centroids_path: str = "data/processed/country_centroids.csv"):
@@ -118,41 +118,104 @@ class SupplyChainNetwork:
         """Return every country name known to the graph (for validating/grounding LLM input)."""
         return self.countries
 
-    def simulate_removal(self, countries: list[str]) -> dict[str, Any]:
+    def _resolve_shocks(self, shocks: dict[str, float]) -> tuple[dict[str, float], list[dict[str, Any]]]:
+        """Resolve and validate a country -> severity shock map.
+
+        Returns (resolved, unresolved). resolved maps canonical country name
+        -> severity. unresolved lists {"input": name, "suggestions": [...]}
+        entries for names that couldn't be matched, and also covers
+        out-of-range severities (reported with empty suggestions) so callers
+        get one consistent error path.
         """
-        Simulate removing one or more countries from the trade network.
+
+        resolved: dict[str, float] = {}
+        unresolved: list[dict[str, Any]] = []
+
+        for name, severity in shocks.items():
+            match, suggestions = self._resolve_country(name)
+            if not match:
+                unresolved.append({"input": name, "suggestions": suggestions})
+            elif not (0 < severity <= 1):
+                unresolved.append({"input": name, "suggestions": [], "error": "severity must be > 0 and <= 1"})
+            else:
+                resolved[match] = severity
+
+        return resolved, unresolved
+
+    @staticmethod
+    def _apply_shocks(g: nx.DiGraph, resolved: dict[str, float]) -> nx.DiGraph:
+        """Return a copy of g with each resolved country's export edges scaled
+        down by its severity (edges scaled to zero are dropped)."""
+
+        g_after = g.copy()
+        edges_to_drop = []
+        for country, severity in resolved.items():
+            retained = 1 - severity
+            for u, v, data in g_after.in_edges(country, data=True):
+                if retained <= 0:
+                    edges_to_drop.append((u, v))
+                    continue
+                data["trade_value_usd"] = data.get("trade_value_usd", 0) * retained
+                qty = data.get("trade_qty_kg")
+                if qty == qty:  # filters NaN
+                    data["trade_qty_kg"] = qty * retained
+        g_after.remove_edges_from(edges_to_drop)
+        return g_after
+
+    def shocked_graph(self, shocks: dict[str, float]) -> dict[str, Any]:
+        """Resolve and validate `shocks`, then return the post-shock graph.
+
+        Exposed separately from simulate_shock so callers that just need the
+        graph for visualization (e.g. app.py) don't have to duplicate the
+        shock-application logic.
+
+        Returns {"success": True, "graph": nx.DiGraph, "resolved": {...}} or
+        {"success": False, "error": str, "unresolved": [...]}.
+        """
+
+        if not shocks:
+            return {"success": False, "error": "No shocks provided.", "unresolved": []}
+
+        resolved, unresolved = self._resolve_shocks(shocks)
+        if unresolved:
+            return {"success": False, "error": "One or more country names were not found in the network, or had an invalid severity.", "unresolved": unresolved}
+
+        return {"success": True, "graph": self._apply_shocks(self.graph, resolved), "resolved": resolved}
+
+    def simulate_shock(self, shocks: dict[str, float]) -> dict[str, Any]:
+        """
+        Simulate one or more countries losing export capacity - an export
+        ban, plant shutdown, shipping corridor closure, etc.
+
+        Rather than deleting a country from the network (which would also
+        wipe out everything it imports - unrealistic for most disruptions),
+        this scales down the trade_value_usd/trade_qty_kg of its outgoing
+        (export) edges by its severity. A country that loses 100% of its
+        export capacity still shows up as an importer; it just stops
+        supplying anyone. Edges scaled to zero are dropped from the
+        after-shock graph so structural stats (components, isolation) still
+        behave sensibly.
 
         Args:
-            countries: list of country names to remove
+            shocks: country name -> severity, where severity is the fraction
+                of that country's export capacity lost, in (0, 1]. E.g.
+                {"USA": 0.4} models the USA's exports dropping 40%;
+                {"USA": 1.0} models a full export stop (the old "removal"
+                behavior, from the export side only).
 
         Returns:
-            A JSON-serializable dict. 
+            A JSON-serializable dict.
             If a failure occurs, 'success' = False and 'error' explains what went wrong.
             If successfull, returns before/after network stats, the economic & structural impact, and which countries
             gained the most structural importance as a result.
         """
 
-        # Make sure input countries can be found in the graph
-        if not countries:
-            return {"success": False, "error": "No countries provided.", "suggestions": []}
+        built = self.shocked_graph(shocks)
+        if not built["success"]:
+            return {"success": False, "error": built["error"], "unresolved": built["unresolved"]}
 
-        resolved: list[str] = []
-        unresolved: list[dict[str, Any]] = []
-
-        for name in countries:
-            match, suggestions = self._resolve_country(name)
-            if match:
-                resolved.append(match)
-            else:
-                unresolved.append({"input": name, "suggestions": suggestions})
-
-        if unresolved:
-            return {"success": False, "error": "One or more country names were not found in the network.", "unresolved": unresolved}
-
-
-        # Create a copy of the graph to show before and after
-        g_after = self.graph.copy()
-        g_after.remove_nodes_from(resolved)
+        resolved = built["resolved"]
+        g_after = built["graph"]
         after = self._snapshot(g_after)
 
         # Save key meetrics
@@ -175,7 +238,7 @@ class SupplyChainNetwork:
         return {
             "success": True,
             "error": None,
-            "scenario": {"removed_countries": resolved},
+            "scenario": {"shocks": [{"country": c, "severity": s} for c, s in resolved.items()]},
             "baseline": self.baseline,
             "after_removal": after,
             "impact": {
@@ -189,21 +252,22 @@ class SupplyChainNetwork:
                 "newly_isolated_countries": isolated,
             },
             "centrality_shifts": {
-                "description": "Countries gaining structural importance (betweenness centrality) after removal, i.e. where risk cascades to.",
+                "description": "Countries gaining structural importance (betweenness centrality) after the shock, i.e. where risk cascades to.",
                 "top_gainers": shifts[:5],
             },
         }
 
     def find_rerouting_options(
         self,
-        removed_countries: list[str],
+        shocks: dict[str, float],
         capacity_multiplier: float = 0.3,
         onboarding_cost_multiplier: float = 0.0,
         onboarding_lead_time_days: float = 45.0,
     ) -> dict[str, Any]:
         """
-        For each importer that sourced this commodity from a country being removed,
-        find the best replacement supplier(s) among the remaining network.
+        For each importer that sourced this commodity from a shocked country,
+        find the best replacement supplier(s) among the remaining network for
+        the portion of that trade the shock displaces.
 
         Rerouting cost is modeled as landed unit cost: a candidate's average
         export unit price (trade_value_usd / trade_qty_kg across its existing
@@ -239,8 +303,13 @@ class SupplyChainNetwork:
         cheap candidate - but is fast and transparent for this dataset's size.
 
         Args:
-            removed_countries: countries whose export capacity is gone (e.g.
-                an export ban) - same semantics as simulate_removal.
+            shocks: country name -> severity (fraction of export capacity
+                lost, in (0, 1]) - same semantics as simulate_shock. Only
+                the displaced fraction of each affected trade relationship
+                needs rerouting; the retained (1 - severity) portion stays
+                with the existing supplier. A shocked country also remains
+                in the candidate pool as a supplier, at its reduced
+                remaining export value.
             capacity_multiplier: how much additional trade value, as a
                 multiple of a candidate's current total exports, it can
                 absorb. Default 0.3 means a candidate can at most absorb 30%
@@ -260,33 +329,27 @@ class SupplyChainNetwork:
             overall summary.
         """
 
-        if not removed_countries:
-            return {"success": False, "error": "No countries provided.", "suggestions": []}
+        if not shocks:
+            return {"success": False, "error": "No shocks provided.", "suggestions": []}
 
         if capacity_multiplier <= 0:
             return {"success": False, "error": "capacity_multiplier must be > 0.", "suggestions": []}
 
-        resolved: list[str] = []
-        unresolved: list[dict[str, Any]] = []
-
-        for name in removed_countries:
-            match, suggestions = self._resolve_country(name)
-            if match:
-                resolved.append(match)
-            else:
-                unresolved.append({"input": name, "suggestions": suggestions})
+        resolved, unresolved = self._resolve_shocks(shocks)
 
         if unresolved:
-            return {"success": False, "error": "One or more country names were not found in the network.", "unresolved": unresolved}
+            return {"success": False, "error": "One or more country names were not found in the network, or had an invalid severity.", "unresolved": unresolved}
+
+        scenario_shocks = [{"country": c, "severity": s} for c, s in resolved.items()]
 
         all_edges = list(self.graph.edges(data=True))
-        displaced = [(u, v, d) for u, v, d in all_edges if v in resolved]
+        displaced = [(u, v, d, resolved[v]) for u, v, d in all_edges if v in resolved]
 
         if not displaced:
             return {
                 "success": True,
                 "error": None,
-                "scenario": {"removed_countries": resolved, "capacity_multiplier": capacity_multiplier},
+                "scenario": {"shocks": scenario_shocks, "capacity_multiplier": capacity_multiplier},
                 "reroutes": [],
                 "summary": {
                     "n_displaced_relationships": 0,
@@ -298,16 +361,19 @@ class SupplyChainNetwork:
             }
 
         # Aggregate each remaining supplier's current export value/quantity, to
-        # derive its average unit price and its rerouting capacity.
+        # derive its average unit price and its rerouting capacity. A shocked
+        # supplier keeps its retained (1 - severity) share of each edge's
+        # value/qty rather than being excluded outright.
         export_value_by_supplier: dict[str, float] = defaultdict(float)
         export_qty_by_supplier: dict[str, float] = defaultdict(float)
         for _, target, data in all_edges:
-            if target in resolved:
+            retained = 1 - resolved.get(target, 0.0)
+            if retained <= 0:
                 continue
-            export_value_by_supplier[target] += data.get("trade_value_usd", 0) or 0
+            export_value_by_supplier[target] += (data.get("trade_value_usd", 0) or 0) * retained
             qty = data.get("trade_qty_kg")
             if qty == qty:  # filters NaN
-                export_qty_by_supplier[target] += qty
+                export_qty_by_supplier[target] += qty * retained
 
         candidate_stats = {}
         for supplier, total_value in export_value_by_supplier.items():
@@ -325,20 +391,21 @@ class SupplyChainNetwork:
             if d.get("estimated_tariff_pct") == d.get("estimated_tariff_pct")
         }
 
-        displaced.sort(key=lambda e: e[2].get("trade_value_usd", 0) or 0, reverse=True)
+        displaced.sort(key=lambda e: (e[2].get("trade_value_usd", 0) or 0) * e[3], reverse=True)
 
         reroutes = []
         new_relationships: set[tuple[str, str]] = set()
         total_displaced_value = 0.0
         total_unmet_value = 0.0
 
-        for importer, removed_supplier, data in displaced:
-            displaced_value = data.get("trade_value_usd", 0) or 0
+        for importer, removed_supplier, data, severity in displaced:
+            full_value = data.get("trade_value_usd", 0) or 0
+            displaced_value = full_value * severity
             total_displaced_value += displaced_value
 
             original_qty = data.get("trade_qty_kg")
             original_unit_price = (
-                displaced_value / original_qty if original_qty == original_qty and original_qty else None
+                full_value / original_qty if original_qty == original_qty and original_qty else None
             )
 
             ranked = []
@@ -409,6 +476,8 @@ class SupplyChainNetwork:
             reroutes.append({
                 "importer": importer,
                 "removed_supplier": removed_supplier,
+                "severity": severity,
+                "full_trade_value_usd": round(full_value, 2),
                 "original_trade_value_usd": round(displaced_value, 2),
                 "original_unit_price_usd_per_kg": round(original_unit_price, 4) if original_unit_price is not None else None,
                 "allocations": allocations,
@@ -420,7 +489,7 @@ class SupplyChainNetwork:
             "success": True,
             "error": None,
             "scenario": {
-                "removed_countries": resolved,
+                "shocks": scenario_shocks,
                 "capacity_multiplier": capacity_multiplier,
                 "onboarding_cost_multiplier": onboarding_cost_multiplier,
                 "onboarding_lead_time_days": onboarding_lead_time_days,
@@ -445,7 +514,7 @@ class SupplyChainNetwork:
         rows = []
 
         for country in self.countries:
-            result = self.simulate_removal([country])
+            result = self.simulate_shock({country: 1.0})
             impact = result["impact"]
             rows.append(
                 {

@@ -111,12 +111,18 @@ tab_simulate, tab_rank, tab_reroute = st.tabs(["What-if simulation", "Vulnerabil
 
 with tab_simulate:
     countries = st.multiselect(
-        "Countries to remove (export ban, plant shutdown, shipping closure, etc.)",
+        "Countries to shock (export ban, plant shutdown, shipping closure, etc.)",
         options=network.countries,
+    )
+    severity = st.slider(
+        "Severity (fraction of export capacity lost)",
+        min_value=0.1, max_value=1.0, value=1.0, step=0.05,
+        help="Applied to every selected country. 1.0 = full export stop. A country's own imports are unaffected.",
     )
 
     if st.button("Run simulation", type="primary", disabled=not countries):
-        result = network.simulate_removal(countries)
+        shocks = {country: severity for country in countries}
+        result = network.simulate_shock(shocks)
 
         if not result["success"]:
             st.error(result["error"])
@@ -133,7 +139,7 @@ with tab_simulate:
             col4.metric("Newly isolated countries", len(impact["newly_isolated_countries"]))
 
             if impact["network_fragmented"]:
-                st.warning("This removal fragments the network into more disconnected components.")
+                st.warning("This shock fragments the network into more disconnected components.")
 
             if impact["newly_isolated_countries"]:
                 st.write("**Newly isolated countries:**", ", ".join(impact["newly_isolated_countries"]))
@@ -143,15 +149,14 @@ with tab_simulate:
                 st.subheader("Countries gaining structural importance (risk cascades to)")
                 st.dataframe(gainers, use_container_width=True, hide_index=True)
 
-            g_after = network.graph.copy()
-            g_after.remove_nodes_from(result["scenario"]["removed_countries"])
+            g_after = network.shocked_graph(shocks)["graph"]
 
             col_before, col_after = st.columns(2)
             with col_before:
-                st.subheader("Before removal")
+                st.subheader("Before shock")
                 components.html(build_network_viz(network.graph, layout, height="550px"), height=570, scrolling=True)
             with col_after:
-                st.subheader("After removal")
+                st.subheader("After shock")
                 components.html(build_network_viz(g_after, layout, height="550px"), height=570, scrolling=True)
 
 with tab_rank:
@@ -161,12 +166,18 @@ with tab_rank:
         st.dataframe(rows, use_container_width=True, hide_index=True)
 
 with tab_reroute:
-    st.caption("Find the best replacement suppliers for countries that lose their source when a supplier is removed.")
+    st.caption("Find the best replacement suppliers for the export capacity a shocked supplier loses.")
 
     reroute_countries = st.multiselect(
-        "Suppliers to remove (export ban, plant shutdown, shipping closure, etc.)",
+        "Suppliers to shock (export ban, plant shutdown, shipping closure, etc.)",
         options=network.countries,
         key="reroute_countries",
+    )
+    reroute_severity = st.slider(
+        "Severity (fraction of export capacity lost)",
+        min_value=0.1, max_value=1.0, value=1.0, step=0.05,
+        help="Applied to every selected supplier. 1.0 = full export stop. Only the displaced fraction needs rerouting.",
+        key="reroute_severity",
     )
     capacity_multiplier = st.slider(
         "Capacity multiplier",
@@ -175,7 +186,8 @@ with tab_reroute:
     )
 
     if st.button("Find rerouting options", type="primary", disabled=not reroute_countries):
-        result = network.find_rerouting_options(reroute_countries, capacity_multiplier=capacity_multiplier)
+        reroute_shocks = {country: reroute_severity for country in reroute_countries}
+        result = network.find_rerouting_options(reroute_shocks, capacity_multiplier=capacity_multiplier)
 
         if not result["success"]:
             st.error(result["error"])
@@ -202,8 +214,7 @@ with tab_reroute:
 
             st.subheader("Rerouted network")
             st.caption("Gray = existing trade. Green = extra volume on an existing relationship. Orange dashed = a brand new trade relationship.")
-            g_after = network.graph.copy()
-            g_after.remove_nodes_from(result["scenario"]["removed_countries"])
+            g_after = network.shocked_graph(reroute_shocks)["graph"]
             components.html(build_reroute_viz(g_after, layout, result["reroutes"], height="600px"), height=620, scrolling=True)
 
             st.subheader("Rerouting detail by importer")

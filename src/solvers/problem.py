@@ -49,7 +49,7 @@ class RerouteProblem:
     """Solver-agnostic definition of a rerouting-optimization problem.
 
     Attributes:
-        scenario: echoes every input parameter (removed_countries and each
+        scenario: echoes every input parameter (shocks and each
             cost/capacity knob), for traceability in solver output.
         displaced: one entry per (importer, removed_supplier) relationship
             that needs replacement supply - kept separate from `demand`
@@ -78,12 +78,12 @@ class RerouteProblem:
 
 def build_reroute_problem(
     network: "SupplyChainNetwork",
-    removed_countries: list[str],
+    shocks: dict[str, float],
     capacity_multiplier: float = 0.3,
     onboarding_cost_multiplier: float = 0.0,
     onboarding_lead_time_days: float = 45.0,
 ) -> dict[str, Any]:
-    """Build a RerouteProblem from the network for the given removal scenario.
+    """Build a RerouteProblem from the network for the given shock scenario.
 
     Mirrors find_rerouting_options' setup logic (displaced relationships,
     candidate cost/capacity, tariff lookup) but stops short of actually
@@ -92,8 +92,11 @@ def build_reroute_problem(
 
     Args:
         network: a loaded SupplyChainNetwork.
-        removed_countries: countries whose export capacity is gone - same
-            semantics as find_rerouting_options.
+        shocks: country name -> severity (fraction of export capacity lost,
+            in (0, 1]) - same semantics as find_rerouting_options. Only the
+            displaced fraction of each affected relationship becomes demand;
+            a shocked country stays in the candidate pool at its reduced
+            remaining export value.
         capacity_multiplier, onboarding_cost_multiplier,
             onboarding_lead_time_days: same semantics and defaults as
             find_rerouting_options.
@@ -102,40 +105,33 @@ def build_reroute_problem(
         {"success": True, "problem": RerouteProblem} on success, or
         {"success": False, "error": str, ...} on the same validation
         failures find_rerouting_options can hit (unknown countries, bad
-        capacity_multiplier).
+        severity, bad capacity_multiplier).
     """
 
-    if not removed_countries:
-        return {"success": False, "error": "No countries provided.", "suggestions": []}
+    if not shocks:
+        return {"success": False, "error": "No shocks provided.", "suggestions": []}
 
     if capacity_multiplier <= 0:
         return {"success": False, "error": "capacity_multiplier must be > 0.", "suggestions": []}
 
-    resolved: list[str] = []
-    unresolved: list[dict[str, Any]] = []
-    for name in removed_countries:
-        match, suggestions = network._resolve_country(name)
-        if match:
-            resolved.append(match)
-        else:
-            unresolved.append({"input": name, "suggestions": suggestions})
+    resolved, unresolved = network._resolve_shocks(shocks)
 
     if unresolved:
         return {
             "success": False,
-            "error": "One or more country names were not found in the network.",
+            "error": "One or more country names were not found in the network, or had an invalid severity.",
             "unresolved": unresolved,
         }
 
     scenario = {
-        "removed_countries": resolved,
+        "shocks": [{"country": c, "severity": s} for c, s in resolved.items()],
         "capacity_multiplier": capacity_multiplier,
         "onboarding_cost_multiplier": onboarding_cost_multiplier,
         "onboarding_lead_time_days": onboarding_lead_time_days,
     }
 
     all_edges = list(network.graph.edges(data=True))
-    displaced_edges = [(u, v, d) for u, v, d in all_edges if v in resolved]
+    displaced_edges = [(u, v, d, resolved[v]) for u, v, d in all_edges if v in resolved]
 
     if not displaced_edges:
         return {
@@ -149,16 +145,19 @@ def build_reroute_problem(
             ),
         }
 
-    # Candidate supply: same aggregation as find_rerouting_options.
+    # Candidate supply: same aggregation as find_rerouting_options - a
+    # shocked supplier keeps its retained (1 - severity) share rather than
+    # being excluded outright.
     export_value_by_supplier: dict[str, float] = defaultdict(float)
     export_qty_by_supplier: dict[str, float] = defaultdict(float)
     for _, target, data in all_edges:
-        if target in resolved:
+        retained = 1 - resolved.get(target, 0.0)
+        if retained <= 0:
             continue
-        export_value_by_supplier[target] += data.get("trade_value_usd", 0) or 0
+        export_value_by_supplier[target] += (data.get("trade_value_usd", 0) or 0) * retained
         qty = data.get("trade_qty_kg")
         if qty == qty:  # filters NaN
-            export_qty_by_supplier[target] += qty
+            export_qty_by_supplier[target] += qty * retained
 
     avg_unit_price: dict[str, float] = {}
     supply: dict[str, float] = {}
@@ -179,16 +178,19 @@ def build_reroute_problem(
     # detail is kept in `displaced` for reporting only.
     demand: dict[str, float] = defaultdict(float)
     displaced: list[dict[str, Any]] = []
-    for importer, removed_supplier, data in displaced_edges:
-        displaced_value = data.get("trade_value_usd", 0) or 0
+    for importer, removed_supplier, data, severity in displaced_edges:
+        full_value = data.get("trade_value_usd", 0) or 0
+        displaced_value = full_value * severity
         original_qty = data.get("trade_qty_kg")
         original_unit_price = (
-            displaced_value / original_qty if original_qty == original_qty and original_qty else None
+            full_value / original_qty if original_qty == original_qty and original_qty else None
         )
         demand[importer] += displaced_value
         displaced.append({
             "importer": importer,
             "removed_supplier": removed_supplier,
+            "severity": severity,
+            "full_trade_value_usd": round(full_value, 2),
             "displaced_value_usd": round(displaced_value, 2),
             "original_unit_price_usd_per_kg": round(original_unit_price, 4)
             if original_unit_price is not None else None,
