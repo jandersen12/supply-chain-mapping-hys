@@ -1,0 +1,1041 @@
+source,target,estimated_tariff_pct,tariff_methodology,is_placeholder_estimate
+Algeria,Netherlands,0.06,importer_default_lower_middle_income,True
+Algeria,Niger,0.06,importer_default_lower_middle_income,True
+Algeria,China,0.06,importer_default_lower_middle_income,True
+Algeria,Ireland,0.06,importer_default_lower_middle_income,True
+Angola,United Kingdom,0.06,importer_default_lower_middle_income,True
+Angola,USA,0.06,importer_default_lower_middle_income,True
+Angola,Portugal,0.06,importer_default_lower_middle_income,True
+Angola,Canada,0.06,importer_default_lower_middle_income,True
+Antigua and Barbuda,USA,0.02,importer_default_high_income,True
+Armenia,Russian Federation,0.04,importer_default_upper_middle_income,True
+Australia,Malaysia,0.02,importer_default_high_income,True
+Australia,USA,0.02,importer_default_high_income,True
+Australia,Viet Nam,0.02,importer_default_high_income,True
+Australia,Brunei Darussalam,0.02,importer_default_high_income,True
+Australia,United Arab Emirates,0.02,importer_default_high_income,True
+Australia,New Zealand,0.02,importer_default_high_income,True
+Australia,Nigeria,0.02,importer_default_high_income,True
+Australia,Libya,0.02,importer_default_high_income,True
+Australia,Indonesia,0.02,importer_default_high_income,True
+Australia,Algeria,0.02,importer_default_high_income,True
+Australia,Brazil,0.02,importer_default_high_income,True
+Australia,Liberia,0.02,importer_default_high_income,True
+Australia,Argentina,0.02,importer_default_high_income,True
+Australia,Azerbaijan,0.02,importer_default_high_income,True
+Austria,Kazakhstan,0.02,importer_default_high_income,True
+Austria,Libya,0.02,importer_default_high_income,True
+Austria,Saudi Arabia,0.02,importer_default_high_income,True
+Austria,Azerbaijan,0.02,importer_default_high_income,True
+Austria,Guyana,0.02,importer_default_high_income,True
+Austria,Iraq,0.02,importer_default_high_income,True
+Austria,Algeria,0.02,importer_default_high_income,True
+Austria,Norway,0.02,importer_default_high_income,True
+Austria,USA,0.02,importer_default_high_income,True
+Austria,Tunisia,0.02,importer_default_high_income,True
+Austria,Israel,0.02,importer_default_high_income,True
+Austria,Ghana,0.02,importer_default_high_income,True
+Austria,Brazil,0.02,importer_default_high_income,True
+Austria,Germany,0.0,eu_eea_uk_ch_zone,True
+Austria,France,0.0,eu_eea_uk_ch_zone,True
+Austria,Slovakia,0.0,eu_eea_uk_ch_zone,True
+Azerbaijan,Russian Federation,0.04,importer_default_upper_middle_income,True
+Azerbaijan,Turkmenistan,0.04,importer_default_upper_middle_income,True
+Azerbaijan,Kazakhstan,0.04,importer_default_upper_middle_income,True
+Bahamas,USA,0.02,importer_default_high_income,True
+Bahamas,Netherlands,0.02,importer_default_high_income,True
+Bahrain,Kuwait,0.02,importer_default_high_income,True
+Belgium,Netherlands,0.0,eu_eea_uk_ch_zone,True
+Belgium,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Belgium,USA,0.02,importer_default_high_income,True
+Belgium,France,0.0,eu_eea_uk_ch_zone,True
+Belgium,Trinidad and Tobago,0.02,importer_default_high_income,True
+Belgium,Nigeria,0.02,importer_default_high_income,True
+Belgium,Algeria,0.02,importer_default_high_income,True
+Belgium,Norway,0.02,importer_default_high_income,True
+Belgium,Germany,0.0,eu_eea_uk_ch_zone,True
+Belgium,Czechia,0.0,eu_eea_uk_ch_zone,True
+Belgium,Spain,0.0,eu_eea_uk_ch_zone,True
+Belgium,United Arab Emirates,0.02,importer_default_high_income,True
+Belgium,Gabon,0.02,importer_default_high_income,True
+Belgium,Bahrain,0.02,importer_default_high_income,True
+Belgium,El Salvador,0.02,importer_default_high_income,True
+Belgium,Angola,0.02,importer_default_high_income,True
+Belgium,Japan,0.02,importer_default_high_income,True
+Belgium,Oman,0.02,importer_default_high_income,True
+Belgium,Côte d'Ivoire,0.02,importer_default_high_income,True
+Belgium,Uruguay,0.02,importer_default_high_income,True
+Belgium,Canada,0.02,importer_default_high_income,True
+Belgium,Viet Nam,0.02,importer_default_high_income,True
+Belgium,Chile,0.02,importer_default_high_income,True
+Belgium,Peru,0.02,importer_default_high_income,True
+Belgium,Israel,0.02,importer_default_high_income,True
+Belgium,Türkiye,0.02,importer_default_high_income,True
+Belgium,India,0.02,importer_default_high_income,True
+Belgium,China,0.02,importer_default_high_income,True
+Belgium,New Caledonia,0.02,importer_default_high_income,True
+Belgium,Azerbaijan,0.02,importer_default_high_income,True
+Belgium,Namibia,0.02,importer_default_high_income,True
+Belgium,Papua New Guinea,0.02,importer_default_high_income,True
+Belgium,Brazil,0.02,importer_default_high_income,True
+Belgium,Madagascar,0.02,importer_default_high_income,True
+Belgium,Indonesia,0.02,importer_default_high_income,True
+Belgium,Cameroon,0.02,importer_default_high_income,True
+Belgium,Thailand,0.02,importer_default_high_income,True
+Belgium,Libya,0.02,importer_default_high_income,True
+Belgium,Singapore,0.02,importer_default_high_income,True
+Belgium,Mauritius,0.02,importer_default_high_income,True
+Belize,Guatemala,0.04,importer_default_upper_middle_income,True
+Bolivia (Plurinational State of),Argentina,0.06,importer_default_lower_middle_income,True
+Bolivia (Plurinational State of),Br. Virgin Isds,0.06,importer_default_lower_middle_income,True
+Bolivia (Plurinational State of),Peru,0.06,importer_default_lower_middle_income,True
+Bolivia (Plurinational State of),Paraguay,0.06,importer_default_lower_middle_income,True
+Brazil,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+Brazil,USA,0.04,importer_default_upper_middle_income,True
+Brazil,Angola,0.04,importer_default_upper_middle_income,True
+Brazil,Guyana,0.04,importer_default_upper_middle_income,True
+Brazil,Algeria,0.04,importer_default_upper_middle_income,True
+Brazil,Gabon,0.04,importer_default_upper_middle_income,True
+Brazil,Argentina,0.04,importer_default_upper_middle_income,True
+Brazil,Ghana,0.04,importer_default_upper_middle_income,True
+Brazil,Nigeria,0.04,importer_default_upper_middle_income,True
+Brazil,France,0.04,importer_default_upper_middle_income,True
+Brazil,Côte d'Ivoire,0.04,importer_default_upper_middle_income,True
+Brazil,Congo,0.04,importer_default_upper_middle_income,True
+Brazil,United Kingdom,0.04,importer_default_upper_middle_income,True
+Brazil,Russian Federation,0.04,importer_default_upper_middle_income,True
+Brazil,Dem. Rep. of the Congo,0.04,importer_default_upper_middle_income,True
+Brazil,Malta,0.04,importer_default_upper_middle_income,True
+Brazil,Netherlands,0.04,importer_default_upper_middle_income,True
+Brazil,Peru,0.04,importer_default_upper_middle_income,True
+Brazil,South Africa,0.04,importer_default_upper_middle_income,True
+Brazil,Bolivia (Plurinational State of),0.04,importer_default_upper_middle_income,True
+Brazil,Japan,0.04,importer_default_upper_middle_income,True
+Brazil,Switzerland,0.04,importer_default_upper_middle_income,True
+Brunei Darussalam,Malaysia,0.02,importer_default_high_income,True
+Brunei Darussalam,Russian Federation,0.02,importer_default_high_income,True
+Brunei Darussalam,Australia,0.02,importer_default_high_income,True
+Brunei Darussalam,United Arab Emirates,0.02,importer_default_high_income,True
+Brunei Darussalam,Saudi Arabia,0.02,importer_default_high_income,True
+Brunei Darussalam,Viet Nam,0.02,importer_default_high_income,True
+Brunei Darussalam,Indonesia,0.02,importer_default_high_income,True
+Brunei Darussalam,Philippines,0.02,importer_default_high_income,True
+Brunei Darussalam,Pakistan,0.02,importer_default_high_income,True
+Brunei Darussalam,Canada,0.02,importer_default_high_income,True
+Brunei Darussalam,Thailand,0.02,importer_default_high_income,True
+Brunei Darussalam,Colombia,0.02,importer_default_high_income,True
+Bulgaria,Kazakhstan,0.02,importer_default_high_income,True
+Bulgaria,Iraq,0.02,importer_default_high_income,True
+Bulgaria,Saudi Arabia,0.02,importer_default_high_income,True
+Bulgaria,Norway,0.02,importer_default_high_income,True
+Bulgaria,Libya,0.02,importer_default_high_income,True
+Bulgaria,Guyana,0.02,importer_default_high_income,True
+Bulgaria,Egypt,0.02,importer_default_high_income,True
+Bulgaria,Azerbaijan,0.02,importer_default_high_income,True
+Bulgaria,Ghana,0.02,importer_default_high_income,True
+Bulgaria,Tunisia,0.02,importer_default_high_income,True
+Bulgaria,Italy,0.0,eu_eea_uk_ch_zone,True
+Bulgaria,Türkiye,0.02,importer_default_high_income,True
+Burkina Faso,United Arab Emirates,0.08,importer_default_low_income,True
+Cabo Verde,Portugal,0.06,importer_default_lower_middle_income,True
+Cambodia,France,0.06,importer_default_lower_middle_income,True
+Canada,USA,0.0,bilateral_fta_bloc,True
+Canada,Nigeria,0.02,importer_default_high_income,True
+Canada,Saudi Arabia,0.02,importer_default_high_income,True
+Canada,Ecuador,0.02,importer_default_high_income,True
+Canada,Côte d'Ivoire,0.02,importer_default_high_income,True
+Canada,Mexico,0.02,importer_default_high_income,True
+Canada,Colombia,0.02,importer_default_high_income,True
+Canada,Guyana,0.02,importer_default_high_income,True
+Canada,Poland,0.02,importer_default_high_income,True
+Canada,Oman,0.02,importer_default_high_income,True
+Canada,Japan,0.02,importer_default_high_income,True
+Canada,United Arab Emirates,0.02,importer_default_high_income,True
+Canada,Qatar,0.02,importer_default_high_income,True
+Canada,Italy,0.02,importer_default_high_income,True
+Canada,Germany,0.02,importer_default_high_income,True
+Canada,China,0.02,importer_default_high_income,True
+Canada,Türkiye,0.02,importer_default_high_income,True
+Canada,United Kingdom,0.02,importer_default_high_income,True
+Canada,Australia,0.02,importer_default_high_income,True
+Canada,Finland,0.02,importer_default_high_income,True
+Canada,Cuba,0.02,importer_default_high_income,True
+Canada,Ireland,0.02,importer_default_high_income,True
+Canada,Netherlands,0.02,importer_default_high_income,True
+Canada,Thailand,0.02,importer_default_high_income,True
+Canada,Grenada,0.02,importer_default_high_income,True
+Canada,Spain,0.02,importer_default_high_income,True
+Canada,India,0.02,importer_default_high_income,True
+Central African Rep.,United Arab Emirates,0.08,importer_default_low_income,True
+Chile,Brazil,0.02,importer_default_high_income,True
+Chile,Argentina,0.02,importer_default_high_income,True
+Chile,Ecuador,0.02,importer_default_high_income,True
+Chile,USA,0.02,importer_default_high_income,True
+China,Russian Federation,0.04,importer_default_upper_middle_income,True
+China,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+China,Malaysia,0.04,importer_default_upper_middle_income,True
+China,Iraq,0.04,importer_default_upper_middle_income,True
+China,Oman,0.04,importer_default_upper_middle_income,True
+China,United Arab Emirates,0.04,importer_default_upper_middle_income,True
+China,Brazil,0.04,importer_default_upper_middle_income,True
+China,Angola,0.04,importer_default_upper_middle_income,True
+China,Kuwait,0.04,importer_default_upper_middle_income,True
+China,Qatar,0.04,importer_default_upper_middle_income,True
+China,USA,0.04,importer_default_upper_middle_income,True
+China,Canada,0.04,importer_default_upper_middle_income,True
+China,Colombia,0.04,importer_default_upper_middle_income,True
+China,Congo,0.04,importer_default_upper_middle_income,True
+China,Ecuador,0.04,importer_default_upper_middle_income,True
+China,Gabon,0.04,importer_default_upper_middle_income,True
+China,Norway,0.04,importer_default_upper_middle_income,True
+China,Ghana,0.04,importer_default_upper_middle_income,True
+China,Kazakhstan,0.04,importer_default_upper_middle_income,True
+China,Libya,0.04,importer_default_upper_middle_income,True
+China,United Kingdom,0.04,importer_default_upper_middle_income,True
+China,Equatorial Guinea,0.04,importer_default_upper_middle_income,True
+China,Nigeria,0.04,importer_default_upper_middle_income,True
+China,Cameroon,0.04,importer_default_upper_middle_income,True
+China,Chad,0.04,importer_default_upper_middle_income,True
+China,Venezuela,0.04,importer_default_upper_middle_income,True
+China,Senegal,0.04,importer_default_upper_middle_income,True
+China,Mexico,0.04,importer_default_upper_middle_income,True
+China,Australia,0.04,importer_default_upper_middle_income,True
+China,Papua New Guinea,0.04,importer_default_upper_middle_income,True
+China,Mongolia,0.04,importer_default_upper_middle_income,True
+China,South Sudan,0.04,importer_default_upper_middle_income,True
+China,Guyana,0.04,importer_default_upper_middle_income,True
+China,Thailand,0.04,importer_default_upper_middle_income,True
+China,Dem. Rep. of the Congo,0.04,importer_default_upper_middle_income,True
+China,Indonesia,0.04,importer_default_upper_middle_income,True
+China,Niger,0.04,importer_default_upper_middle_income,True
+China,New Zealand,0.04,importer_default_upper_middle_income,True
+China,Mozambique,0.04,importer_default_upper_middle_income,True
+China,Viet Nam,0.04,importer_default_upper_middle_income,True
+China,Argentina,0.04,importer_default_upper_middle_income,True
+China,South Africa,0.04,importer_default_upper_middle_income,True
+China,Albania,0.04,importer_default_upper_middle_income,True
+China,India,0.04,importer_default_upper_middle_income,True
+China,Bahrain,0.04,importer_default_upper_middle_income,True
+Colombia,USA,0.04,importer_default_upper_middle_income,True
+Colombia,Nigeria,0.04,importer_default_upper_middle_income,True
+Colombia,Guyana,0.04,importer_default_upper_middle_income,True
+Colombia,"Areas, nes",0.04,importer_default_upper_middle_income,True
+Colombia,Ecuador,0.04,importer_default_upper_middle_income,True
+Colombia,China,0.04,importer_default_upper_middle_income,True
+Colombia,Peru,0.04,importer_default_upper_middle_income,True
+Costa Rica,USA,0.04,importer_default_upper_middle_income,True
+Costa Rica,China,0.04,importer_default_upper_middle_income,True
+Costa Rica,Spain,0.04,importer_default_upper_middle_income,True
+Costa Rica,Japan,0.04,importer_default_upper_middle_income,True
+Croatia,Azerbaijan,0.02,importer_default_high_income,True
+Croatia,Kazakhstan,0.02,importer_default_high_income,True
+Croatia,Nigeria,0.02,importer_default_high_income,True
+Croatia,Norway,0.02,importer_default_high_income,True
+Croatia,Libya,0.02,importer_default_high_income,True
+Croatia,Saudi Arabia,0.02,importer_default_high_income,True
+Croatia,Guyana,0.02,importer_default_high_income,True
+Croatia,Hungary,0.0,eu_eea_uk_ch_zone,True
+Croatia,Pakistan,0.02,importer_default_high_income,True
+Croatia,USA,0.02,importer_default_high_income,True
+Croatia,Slovenia,0.0,eu_eea_uk_ch_zone,True
+Cyprus,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Czechia,Azerbaijan,0.02,importer_default_high_income,True
+Czechia,Russian Federation,0.02,importer_default_high_income,True
+Czechia,Kazakhstan,0.02,importer_default_high_income,True
+Czechia,Norway,0.02,importer_default_high_income,True
+Czechia,Guyana,0.02,importer_default_high_income,True
+Czechia,Belgium,0.0,eu_eea_uk_ch_zone,True
+Czechia,Poland,0.0,eu_eea_uk_ch_zone,True
+Czechia,Italy,0.0,eu_eea_uk_ch_zone,True
+Czechia,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Czechia,Germany,0.0,eu_eea_uk_ch_zone,True
+Czechia,Switzerland,0.0,eu_eea_uk_ch_zone,True
+Czechia,Spain,0.0,eu_eea_uk_ch_zone,True
+Côte d'Ivoire,Nigeria,0.06,importer_default_lower_middle_income,True
+Côte d'Ivoire,Colombia,0.06,importer_default_lower_middle_income,True
+Côte d'Ivoire,France,0.06,importer_default_lower_middle_income,True
+Denmark,USA,0.02,importer_default_high_income,True
+Denmark,Norway,0.02,importer_default_high_income,True
+Denmark,Libya,0.02,importer_default_high_income,True
+Denmark,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Denmark,"Areas, nes",0.02,importer_default_high_income,True
+Denmark,Netherlands,0.0,eu_eea_uk_ch_zone,True
+Denmark,China,0.02,importer_default_high_income,True
+Denmark,Greenland,0.02,importer_default_high_income,True
+Denmark,Switzerland,0.0,eu_eea_uk_ch_zone,True
+Denmark,Lithuania,0.0,eu_eea_uk_ch_zone,True
+Dominican Rep.,USA,0.04,importer_default_upper_middle_income,True
+Dominican Rep.,United Kingdom,0.04,importer_default_upper_middle_income,True
+Dominican Rep.,Italy,0.04,importer_default_upper_middle_income,True
+Ecuador,Spain,0.04,importer_default_upper_middle_income,True
+Ecuador,USA,0.04,importer_default_upper_middle_income,True
+Egypt,Saudi Arabia,0.06,importer_default_lower_middle_income,True
+Egypt,Iraq,0.06,importer_default_lower_middle_income,True
+Egypt,Kuwait,0.06,importer_default_lower_middle_income,True
+El Salvador,India,0.06,importer_default_lower_middle_income,True
+El Salvador,Israel,0.06,importer_default_lower_middle_income,True
+Estonia,Latvia,0.0,eu_eea_uk_ch_zone,True
+Fiji,China,0.04,importer_default_upper_middle_income,True
+Fiji,Australia,0.04,importer_default_upper_middle_income,True
+Finland,Norway,0.02,importer_default_high_income,True
+Finland,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Finland,USA,0.02,importer_default_high_income,True
+Finland,Guyana,0.02,importer_default_high_income,True
+Finland,Denmark,0.0,eu_eea_uk_ch_zone,True
+Finland,Canada,0.02,importer_default_high_income,True
+France,USA,0.02,importer_default_high_income,True
+France,Nigeria,0.02,importer_default_high_income,True
+France,Kazakhstan,0.02,importer_default_high_income,True
+France,Algeria,0.02,importer_default_high_income,True
+France,Norway,0.02,importer_default_high_income,True
+France,Libya,0.02,importer_default_high_income,True
+France,Iraq,0.02,importer_default_high_income,True
+France,Angola,0.02,importer_default_high_income,True
+France,Saudi Arabia,0.02,importer_default_high_income,True
+France,Chad,0.02,importer_default_high_income,True
+France,Brazil,0.02,importer_default_high_income,True
+France,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+France,Azerbaijan,0.02,importer_default_high_income,True
+France,Canada,0.02,importer_default_high_income,True
+France,Guyana,0.02,importer_default_high_income,True
+France,United Arab Emirates,0.02,importer_default_high_income,True
+France,Cameroon,0.02,importer_default_high_income,True
+France,Equatorial Guinea,0.02,importer_default_high_income,True
+France,Niger,0.02,importer_default_high_income,True
+France,Dem. Rep. of the Congo,0.02,importer_default_high_income,True
+France,Côte d'Ivoire,0.02,importer_default_high_income,True
+France,Egypt,0.02,importer_default_high_income,True
+France,Congo,0.02,importer_default_high_income,True
+France,Italy,0.0,eu_eea_uk_ch_zone,True
+France,Belgium,0.0,eu_eea_uk_ch_zone,True
+France,"Areas, nes",0.02,importer_default_high_income,True
+France,Spain,0.0,eu_eea_uk_ch_zone,True
+France,Germany,0.0,eu_eea_uk_ch_zone,True
+France,Qatar,0.02,importer_default_high_income,True
+France,China,0.02,importer_default_high_income,True
+France,Netherlands,0.0,eu_eea_uk_ch_zone,True
+France,Gabon,0.02,importer_default_high_income,True
+France,Israel,0.02,importer_default_high_income,True
+France,Bahrain,0.02,importer_default_high_income,True
+France,Singapore,0.02,importer_default_high_income,True
+France,Senegal,0.02,importer_default_high_income,True
+France,India,0.02,importer_default_high_income,True
+Georgia,Russian Federation,0.04,importer_default_upper_middle_income,True
+Georgia,Netherlands,0.04,importer_default_upper_middle_income,True
+Germany,Norway,0.02,importer_default_high_income,True
+Germany,USA,0.02,importer_default_high_income,True
+Germany,Kazakhstan,0.02,importer_default_high_income,True
+Germany,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Germany,Libya,0.02,importer_default_high_income,True
+Germany,Guyana,0.02,importer_default_high_income,True
+Germany,Iraq,0.02,importer_default_high_income,True
+Germany,Nigeria,0.02,importer_default_high_income,True
+Germany,Azerbaijan,0.02,importer_default_high_income,True
+Germany,Saudi Arabia,0.02,importer_default_high_income,True
+Germany,Chad,0.02,importer_default_high_income,True
+Germany,Algeria,0.02,importer_default_high_income,True
+Germany,Mexico,0.02,importer_default_high_income,True
+Germany,United Arab Emirates,0.02,importer_default_high_income,True
+Germany,Canada,0.02,importer_default_high_income,True
+Germany,Brazil,0.02,importer_default_high_income,True
+Germany,Egypt,0.02,importer_default_high_income,True
+Germany,Cameroon,0.02,importer_default_high_income,True
+Germany,Denmark,0.0,eu_eea_uk_ch_zone,True
+Germany,Côte d'Ivoire,0.02,importer_default_high_income,True
+Germany,Angola,0.02,importer_default_high_income,True
+Germany,Poland,0.0,eu_eea_uk_ch_zone,True
+Germany,Netherlands,0.0,eu_eea_uk_ch_zone,True
+Germany,Senegal,0.02,importer_default_high_income,True
+Germany,Ghana,0.02,importer_default_high_income,True
+Germany,Italy,0.0,eu_eea_uk_ch_zone,True
+Germany,Gabon,0.02,importer_default_high_income,True
+Germany,Tunisia,0.02,importer_default_high_income,True
+Germany,Equatorial Guinea,0.02,importer_default_high_income,True
+Germany,Russian Federation,0.02,importer_default_high_income,True
+Germany,France,0.0,eu_eea_uk_ch_zone,True
+Germany,Spain,0.0,eu_eea_uk_ch_zone,True
+Germany,Taiwan,0.02,importer_default_high_income,True
+Ghana,United Arab Emirates,0.06,importer_default_lower_middle_income,True
+Ghana,Switzerland,0.06,importer_default_lower_middle_income,True
+Ghana,Nigeria,0.06,importer_default_lower_middle_income,True
+Ghana,Greece,0.06,importer_default_lower_middle_income,True
+Ghana,Marshall Isds,0.06,importer_default_lower_middle_income,True
+Ghana,Central African Rep.,0.06,importer_default_lower_middle_income,True
+Ghana,Angola,0.06,importer_default_lower_middle_income,True
+Ghana,Togo,0.06,importer_default_lower_middle_income,True
+Ghana,United Kingdom,0.06,importer_default_lower_middle_income,True
+Ghana,China,0.06,importer_default_lower_middle_income,True
+Greece,Iraq,0.02,importer_default_high_income,True
+Greece,Kazakhstan,0.02,importer_default_high_income,True
+Greece,Libya,0.02,importer_default_high_income,True
+Greece,Saudi Arabia,0.02,importer_default_high_income,True
+Greece,Norway,0.02,importer_default_high_income,True
+Greece,Egypt,0.02,importer_default_high_income,True
+Greece,Azerbaijan,0.02,importer_default_high_income,True
+Greece,Guyana,0.02,importer_default_high_income,True
+Greece,Nigeria,0.02,importer_default_high_income,True
+Greece,Côte d'Ivoire,0.02,importer_default_high_income,True
+Greece,Algeria,0.02,importer_default_high_income,True
+Greece,Turkmenistan,0.02,importer_default_high_income,True
+Greece,Israel,0.02,importer_default_high_income,True
+Greece,Albania,0.02,importer_default_high_income,True
+Greece,France,0.0,eu_eea_uk_ch_zone,True
+Grenada,Jamaica,0.04,importer_default_upper_middle_income,True
+Grenada,USA,0.04,importer_default_upper_middle_income,True
+Grenada,United Kingdom,0.04,importer_default_upper_middle_income,True
+Guatemala,Rep. of Korea,0.04,importer_default_upper_middle_income,True
+Guatemala,USA,0.04,importer_default_upper_middle_income,True
+Guatemala,India,0.04,importer_default_upper_middle_income,True
+Guatemala,China,0.04,importer_default_upper_middle_income,True
+Guatemala,Mexico,0.04,importer_default_upper_middle_income,True
+Guatemala,Germany,0.04,importer_default_upper_middle_income,True
+Guyana,USA,0.02,importer_default_high_income,True
+Guyana,United Kingdom,0.02,importer_default_high_income,True
+Hungary,Russian Federation,0.02,importer_default_high_income,True
+Hungary,Croatia,0.0,eu_eea_uk_ch_zone,True
+Hungary,Slovenia,0.0,eu_eea_uk_ch_zone,True
+Hungary,Austria,0.0,eu_eea_uk_ch_zone,True
+Hungary,USA,0.02,importer_default_high_income,True
+Hungary,Canada,0.02,importer_default_high_income,True
+Hungary,Nigeria,0.02,importer_default_high_income,True
+Iceland,Denmark,0.0,eu_eea_uk_ch_zone,True
+Iceland,USA,0.02,importer_default_high_income,True
+Iceland,Austria,0.0,eu_eea_uk_ch_zone,True
+India,Russian Federation,0.06,importer_default_lower_middle_income,True
+India,Iraq,0.06,importer_default_lower_middle_income,True
+India,Saudi Arabia,0.06,importer_default_lower_middle_income,True
+India,United Arab Emirates,0.06,importer_default_lower_middle_income,True
+India,Nigeria,0.06,importer_default_lower_middle_income,True
+India,USA,0.06,importer_default_lower_middle_income,True
+India,Angola,0.06,importer_default_lower_middle_income,True
+India,Kuwait,0.06,importer_default_lower_middle_income,True
+India,Venezuela,0.06,importer_default_lower_middle_income,True
+India,Colombia,0.06,importer_default_lower_middle_income,True
+India,Mexico,0.06,importer_default_lower_middle_income,True
+India,Brazil,0.06,importer_default_lower_middle_income,True
+India,Canada,0.06,importer_default_lower_middle_income,True
+India,Qatar,0.06,importer_default_lower_middle_income,True
+India,Algeria,0.06,importer_default_lower_middle_income,True
+India,Azerbaijan,0.06,importer_default_lower_middle_income,True
+India,Türkiye,0.06,importer_default_lower_middle_income,True
+India,Oman,0.06,importer_default_lower_middle_income,True
+India,Malaysia,0.06,importer_default_lower_middle_income,True
+India,Dem. Rep. of the Congo,0.06,importer_default_lower_middle_income,True
+India,Brunei Darussalam,0.06,importer_default_lower_middle_income,True
+India,Ghana,0.06,importer_default_lower_middle_income,True
+India,Kazakhstan,0.06,importer_default_lower_middle_income,True
+India,Egypt,0.06,importer_default_lower_middle_income,True
+India,Ecuador,0.06,importer_default_lower_middle_income,True
+India,Congo,0.06,importer_default_lower_middle_income,True
+India,Libya,0.06,importer_default_lower_middle_income,True
+India,Singapore,0.06,importer_default_lower_middle_income,True
+India,Rep. of Korea,0.06,importer_default_lower_middle_income,True
+India,Equatorial Guinea,0.06,importer_default_lower_middle_income,True
+India,Australia,0.06,importer_default_lower_middle_income,True
+India,Senegal,0.06,importer_default_lower_middle_income,True
+Indonesia,Nigeria,0.04,importer_default_upper_middle_income,True
+Indonesia,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+Indonesia,Angola,0.04,importer_default_upper_middle_income,True
+Indonesia,Gabon,0.04,importer_default_upper_middle_income,True
+Indonesia,Australia,0.04,importer_default_upper_middle_income,True
+Indonesia,USA,0.04,importer_default_upper_middle_income,True
+Indonesia,Algeria,0.04,importer_default_upper_middle_income,True
+Indonesia,Brunei Darussalam,0.04,importer_default_upper_middle_income,True
+Indonesia,Azerbaijan,0.04,importer_default_upper_middle_income,True
+Indonesia,Equatorial Guinea,0.04,importer_default_upper_middle_income,True
+Indonesia,Malaysia,0.04,importer_default_upper_middle_income,True
+Indonesia,Brazil,0.04,importer_default_upper_middle_income,True
+Indonesia,United Arab Emirates,0.04,importer_default_upper_middle_income,True
+Indonesia,Papua New Guinea,0.04,importer_default_upper_middle_income,True
+Indonesia,Norway,0.04,importer_default_upper_middle_income,True
+Indonesia,New Zealand,0.04,importer_default_upper_middle_income,True
+Indonesia,Singapore,0.04,importer_default_upper_middle_income,True
+Indonesia,Japan,0.04,importer_default_upper_middle_income,True
+Indonesia,Italy,0.04,importer_default_upper_middle_income,True
+Indonesia,Canada,0.04,importer_default_upper_middle_income,True
+Indonesia,Germany,0.04,importer_default_upper_middle_income,True
+Indonesia,Taiwan,0.04,importer_default_upper_middle_income,True
+Indonesia,India,0.04,importer_default_upper_middle_income,True
+Ireland,USA,0.02,importer_default_high_income,True
+Ireland,Azerbaijan,0.02,importer_default_high_income,True
+Ireland,France,0.0,eu_eea_uk_ch_zone,True
+Ireland,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Ireland,Germany,0.0,eu_eea_uk_ch_zone,True
+Ireland,India,0.02,importer_default_high_income,True
+Israel,"Areas, nes",0.02,importer_default_high_income,True
+Italy,Libya,0.02,importer_default_high_income,True
+Italy,Azerbaijan,0.02,importer_default_high_income,True
+Italy,Kazakhstan,0.02,importer_default_high_income,True
+Italy,USA,0.02,importer_default_high_income,True
+Italy,Iraq,0.02,importer_default_high_income,True
+Italy,Nigeria,0.02,importer_default_high_income,True
+Italy,Saudi Arabia,0.02,importer_default_high_income,True
+Italy,Norway,0.02,importer_default_high_income,True
+Italy,Algeria,0.02,importer_default_high_income,True
+Italy,Angola,0.02,importer_default_high_income,True
+Italy,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Italy,Mexico,0.02,importer_default_high_income,True
+Italy,Brazil,0.02,importer_default_high_income,True
+Italy,Cameroon,0.02,importer_default_high_income,True
+Italy,Ghana,0.02,importer_default_high_income,True
+Italy,Gabon,0.02,importer_default_high_income,True
+Italy,Sudan,0.02,importer_default_high_income,True
+Italy,Equatorial Guinea,0.02,importer_default_high_income,True
+Italy,Guyana,0.02,importer_default_high_income,True
+Italy,Venezuela,0.02,importer_default_high_income,True
+Italy,Congo,0.02,importer_default_high_income,True
+Italy,Côte d'Ivoire,0.02,importer_default_high_income,True
+Italy,Tunisia,0.02,importer_default_high_income,True
+Italy,United Arab Emirates,0.02,importer_default_high_income,True
+Italy,Malaysia,0.02,importer_default_high_income,True
+Italy,Senegal,0.02,importer_default_high_income,True
+Italy,Spain,0.0,eu_eea_uk_ch_zone,True
+Italy,Egypt,0.02,importer_default_high_income,True
+Italy,Colombia,0.02,importer_default_high_income,True
+Italy,Germany,0.0,eu_eea_uk_ch_zone,True
+Italy,Albania,0.02,importer_default_high_income,True
+Italy,Croatia,0.0,eu_eea_uk_ch_zone,True
+Italy,Austria,0.0,eu_eea_uk_ch_zone,True
+Italy,"Other Europe, nes",0.02,importer_default_high_income,True
+Italy,France,0.0,eu_eea_uk_ch_zone,True
+Italy,Luxembourg,0.0,eu_eea_uk_ch_zone,True
+Jamaica,Brazil,0.04,importer_default_upper_middle_income,True
+Jamaica,Colombia,0.04,importer_default_upper_middle_income,True
+Jamaica,Barbados,0.04,importer_default_upper_middle_income,True
+Jamaica,Spain,0.04,importer_default_upper_middle_income,True
+Jamaica,USA,0.04,importer_default_upper_middle_income,True
+Japan,United Arab Emirates,0.02,importer_default_high_income,True
+Japan,Saudi Arabia,0.02,importer_default_high_income,True
+Japan,Kuwait,0.02,importer_default_high_income,True
+Japan,Qatar,0.02,importer_default_high_income,True
+Japan,USA,0.02,importer_default_high_income,True
+Japan,Ecuador,0.02,importer_default_high_income,True
+Japan,Oman,0.02,importer_default_high_income,True
+Japan,Australia,0.02,importer_default_high_income,True
+Japan,Viet Nam,0.02,importer_default_high_income,True
+Japan,Brunei Darussalam,0.02,importer_default_high_income,True
+Japan,Indonesia,0.02,importer_default_high_income,True
+Japan,Mexico,0.02,importer_default_high_income,True
+Japan,Canada,0.02,importer_default_high_income,True
+Japan,South Sudan,0.02,importer_default_high_income,True
+Jordan,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+Jordan,Iraq,0.04,importer_default_upper_middle_income,True
+Kazakhstan,Netherlands,0.04,importer_default_upper_middle_income,True
+Kazakhstan,Kuwait,0.04,importer_default_upper_middle_income,True
+Kazakhstan,United Arab Emirates,0.04,importer_default_upper_middle_income,True
+Kenya,China,0.06,importer_default_lower_middle_income,True
+Kenya,Sweden,0.06,importer_default_lower_middle_income,True
+Kyrgyzstan,Kazakhstan,0.06,importer_default_lower_middle_income,True
+Latvia,Poland,0.0,eu_eea_uk_ch_zone,True
+Latvia,Estonia,0.0,eu_eea_uk_ch_zone,True
+Lesotho,South Africa,0.06,importer_default_lower_middle_income,True
+Lithuania,Saudi Arabia,0.02,importer_default_high_income,True
+Lithuania,Norway,0.02,importer_default_high_income,True
+Lithuania,Algeria,0.02,importer_default_high_income,True
+Lithuania,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Lithuania,USA,0.02,importer_default_high_income,True
+Lithuania,Latvia,0.0,eu_eea_uk_ch_zone,True
+Luxembourg,Netherlands,0.0,eu_eea_uk_ch_zone,True
+Luxembourg,Germany,0.0,eu_eea_uk_ch_zone,True
+Luxembourg,Belgium,0.0,eu_eea_uk_ch_zone,True
+Luxembourg,France,0.0,eu_eea_uk_ch_zone,True
+Luxembourg,"Other Europe, nes",0.02,importer_default_high_income,True
+Malawi,China,0.08,importer_default_low_income,True
+Malawi,United Arab Emirates,0.08,importer_default_low_income,True
+Malaysia,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+Malaysia,United Arab Emirates,0.04,importer_default_upper_middle_income,True
+Malaysia,USA,0.04,importer_default_upper_middle_income,True
+Malaysia,Qatar,0.04,importer_default_upper_middle_income,True
+Malaysia,Gabon,0.04,importer_default_upper_middle_income,True
+Malaysia,Cameroon,0.04,importer_default_upper_middle_income,True
+Malaysia,Brazil,0.04,importer_default_upper_middle_income,True
+Malaysia,Angola,0.04,importer_default_upper_middle_income,True
+Malaysia,Sudan,0.04,importer_default_upper_middle_income,True
+Malaysia,Thailand,0.04,importer_default_upper_middle_income,True
+Malaysia,Congo,0.04,importer_default_upper_middle_income,True
+Malaysia,Kuwait,0.04,importer_default_upper_middle_income,True
+Malaysia,Chad,0.04,importer_default_upper_middle_income,True
+Malaysia,Libya,0.04,importer_default_upper_middle_income,True
+Malaysia,Indonesia,0.04,importer_default_upper_middle_income,True
+Malaysia,Argentina,0.04,importer_default_upper_middle_income,True
+Malaysia,Oman,0.04,importer_default_upper_middle_income,True
+Malaysia,Brunei Darussalam,0.04,importer_default_upper_middle_income,True
+Malaysia,Russian Federation,0.04,importer_default_upper_middle_income,True
+Malaysia,Viet Nam,0.04,importer_default_upper_middle_income,True
+Malaysia,Australia,0.04,importer_default_upper_middle_income,True
+Malaysia,Nigeria,0.04,importer_default_upper_middle_income,True
+Malaysia,United Kingdom,0.04,importer_default_upper_middle_income,True
+Malaysia,Niger,0.04,importer_default_upper_middle_income,True
+Malaysia,Iraq,0.04,importer_default_upper_middle_income,True
+Malaysia,China,0.04,importer_default_upper_middle_income,True
+Maldives,Spain,0.04,importer_default_upper_middle_income,True
+Malta,Netherlands,0.0,eu_eea_uk_ch_zone,True
+Malta,USA,0.02,importer_default_high_income,True
+Malta,Japan,0.02,importer_default_high_income,True
+Montserrat,Antigua and Barbuda,0.02,importer_default_high_income,True
+Montserrat,Curaçao,0.02,importer_default_high_income,True
+Morocco,"Areas, nes",0.06,importer_default_lower_middle_income,True
+Mozambique,South Africa,0.08,importer_default_low_income,True
+Mozambique,United Arab Emirates,0.08,importer_default_low_income,True
+Mozambique,Portugal,0.08,importer_default_low_income,True
+Mozambique,Germany,0.08,importer_default_low_income,True
+Mozambique,France,0.08,importer_default_low_income,True
+Mozambique,Namibia,0.08,importer_default_low_income,True
+Mozambique,Eswatini,0.08,importer_default_low_income,True
+Namibia,South Africa,0.04,importer_default_upper_middle_income,True
+Namibia,Canada,0.04,importer_default_upper_middle_income,True
+Namibia,Italy,0.04,importer_default_upper_middle_income,True
+Namibia,India,0.04,importer_default_upper_middle_income,True
+Netherlands,USA,0.02,importer_default_high_income,True
+Netherlands,Norway,0.02,importer_default_high_income,True
+Netherlands,Kazakhstan,0.02,importer_default_high_income,True
+Netherlands,Iraq,0.02,importer_default_high_income,True
+Netherlands,Brazil,0.02,importer_default_high_income,True
+Netherlands,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Guyana,0.02,importer_default_high_income,True
+Netherlands,Saudi Arabia,0.02,importer_default_high_income,True
+Netherlands,Nigeria,0.02,importer_default_high_income,True
+Netherlands,Canada,0.02,importer_default_high_income,True
+Netherlands,Libya,0.02,importer_default_high_income,True
+Netherlands,Belgium,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Algeria,0.02,importer_default_high_income,True
+Netherlands,Russian Federation,0.02,importer_default_high_income,True
+Netherlands,Angola,0.02,importer_default_high_income,True
+Netherlands,Cameroon,0.02,importer_default_high_income,True
+Netherlands,Chad,0.02,importer_default_high_income,True
+Netherlands,Côte d'Ivoire,0.02,importer_default_high_income,True
+Netherlands,Israel,0.02,importer_default_high_income,True
+Netherlands,Gabon,0.02,importer_default_high_income,True
+Netherlands,Colombia,0.02,importer_default_high_income,True
+Netherlands,Argentina,0.02,importer_default_high_income,True
+Netherlands,Denmark,0.0,eu_eea_uk_ch_zone,True
+Netherlands,"Other Europe, nes",0.02,importer_default_high_income,True
+Netherlands,Congo,0.02,importer_default_high_income,True
+Netherlands,Senegal,0.02,importer_default_high_income,True
+Netherlands,Germany,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Equatorial Guinea,0.02,importer_default_high_income,True
+Netherlands,Tunisia,0.02,importer_default_high_income,True
+Netherlands,United Arab Emirates,0.02,importer_default_high_income,True
+Netherlands,Ghana,0.02,importer_default_high_income,True
+Netherlands,Cyprus,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Australia,0.02,importer_default_high_income,True
+Netherlands,Türkiye,0.02,importer_default_high_income,True
+Netherlands,"Areas, nes",0.02,importer_default_high_income,True
+Netherlands,France,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Spain,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Qatar,0.02,importer_default_high_income,True
+Netherlands,Italy,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Kuwait,0.02,importer_default_high_income,True
+Netherlands,Malaysia,0.02,importer_default_high_income,True
+Netherlands,South Africa,0.02,importer_default_high_income,True
+Netherlands,Rep. of Korea,0.02,importer_default_high_income,True
+Netherlands,Togo,0.02,importer_default_high_income,True
+Netherlands,Singapore,0.02,importer_default_high_income,True
+Netherlands,India,0.02,importer_default_high_income,True
+Netherlands,Philippines,0.02,importer_default_high_income,True
+Netherlands,Curaçao,0.02,importer_default_high_income,True
+Netherlands,Thailand,0.02,importer_default_high_income,True
+Netherlands,Namibia,0.02,importer_default_high_income,True
+Netherlands,Oman,0.02,importer_default_high_income,True
+Netherlands,Slovenia,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Poland,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Morocco,0.02,importer_default_high_income,True
+Netherlands,Czechia,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Aruba,0.02,importer_default_high_income,True
+Netherlands,Egypt,0.02,importer_default_high_income,True
+Netherlands,Portugal,0.0,eu_eea_uk_ch_zone,True
+Netherlands,Luxembourg,0.0,eu_eea_uk_ch_zone,True
+Netherlands,China,0.02,importer_default_high_income,True
+Netherlands,Liberia,0.02,importer_default_high_income,True
+Netherlands,Chile,0.02,importer_default_high_income,True
+Netherlands,Jordan,0.02,importer_default_high_income,True
+Netherlands,Austria,0.0,eu_eea_uk_ch_zone,True
+Netherlands,"China, Hong Kong SAR",0.02,importer_default_high_income,True
+New Zealand,China,0.02,importer_default_high_income,True
+New Zealand,India,0.02,importer_default_high_income,True
+New Zealand,Australia,0.02,importer_default_high_income,True
+Nicaragua,USA,0.06,importer_default_lower_middle_income,True
+Nicaragua,Guatemala,0.06,importer_default_lower_middle_income,True
+Norway,USA,0.02,importer_default_high_income,True
+Norway,Nigeria,0.02,importer_default_high_income,True
+Norway,United Kingdom,0.02,importer_default_high_income,True
+Norway,Libya,0.02,importer_default_high_income,True
+Oman,Kuwait,0.02,importer_default_high_income,True
+Oman,United Arab Emirates,0.02,importer_default_high_income,True
+Oman,Indonesia,0.02,importer_default_high_income,True
+Oman,South Africa,0.02,importer_default_high_income,True
+Oman,Qatar,0.02,importer_default_high_income,True
+Oman,Türkiye,0.02,importer_default_high_income,True
+Oman,Iran,0.02,importer_default_high_income,True
+Oman,Norway,0.02,importer_default_high_income,True
+Pakistan,Saudi Arabia,0.06,importer_default_lower_middle_income,True
+Pakistan,United Arab Emirates,0.06,importer_default_lower_middle_income,True
+Pakistan,USA,0.06,importer_default_lower_middle_income,True
+Pakistan,Sao Tome and Principe,0.06,importer_default_lower_middle_income,True
+Pakistan,Kuwait,0.06,importer_default_lower_middle_income,True
+Paraguay,Brazil,0.04,importer_default_upper_middle_income,True
+Peru,Ecuador,0.04,importer_default_upper_middle_income,True
+Peru,USA,0.04,importer_default_upper_middle_income,True
+Peru,Nigeria,0.04,importer_default_upper_middle_income,True
+Peru,Brazil,0.04,importer_default_upper_middle_income,True
+Peru,Argentina,0.04,importer_default_upper_middle_income,True
+Peru,Trinidad and Tobago,0.04,importer_default_upper_middle_income,True
+Peru,Colombia,0.04,importer_default_upper_middle_income,True
+Peru,Mexico,0.04,importer_default_upper_middle_income,True
+Peru,France,0.04,importer_default_upper_middle_income,True
+Peru,Spain,0.04,importer_default_upper_middle_income,True
+Peru,Canada,0.04,importer_default_upper_middle_income,True
+Peru,Japan,0.04,importer_default_upper_middle_income,True
+Philippines,Saudi Arabia,0.06,importer_default_lower_middle_income,True
+Philippines,United Arab Emirates,0.06,importer_default_lower_middle_income,True
+Philippines,Iraq,0.06,importer_default_lower_middle_income,True
+Philippines,Colombia,0.06,importer_default_lower_middle_income,True
+Philippines,Japan,0.06,importer_default_lower_middle_income,True
+Philippines,Qatar,0.06,importer_default_lower_middle_income,True
+Philippines,Malaysia,0.06,importer_default_lower_middle_income,True
+Philippines,Brunei Darussalam,0.06,importer_default_lower_middle_income,True
+Poland,Saudi Arabia,0.02,importer_default_high_income,True
+Poland,Norway,0.02,importer_default_high_income,True
+Poland,USA,0.02,importer_default_high_income,True
+Poland,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Poland,Nigeria,0.02,importer_default_high_income,True
+Poland,Guyana,0.02,importer_default_high_income,True
+Poland,Kazakhstan,0.02,importer_default_high_income,True
+Poland,Algeria,0.02,importer_default_high_income,True
+Poland,Venezuela,0.02,importer_default_high_income,True
+Poland,Switzerland,0.0,eu_eea_uk_ch_zone,True
+Poland,Côte d'Ivoire,0.02,importer_default_high_income,True
+Portugal,Brazil,0.02,importer_default_high_income,True
+Portugal,Algeria,0.02,importer_default_high_income,True
+Portugal,Azerbaijan,0.02,importer_default_high_income,True
+Portugal,USA,0.02,importer_default_high_income,True
+Portugal,Nigeria,0.02,importer_default_high_income,True
+Portugal,Norway,0.02,importer_default_high_income,True
+Portugal,Ghana,0.02,importer_default_high_income,True
+Portugal,Angola,0.02,importer_default_high_income,True
+Portugal,Libya,0.02,importer_default_high_income,True
+Portugal,Spain,0.0,eu_eea_uk_ch_zone,True
+Portugal,Italy,0.0,eu_eea_uk_ch_zone,True
+Qatar,Kuwait,0.02,importer_default_high_income,True
+Qatar,Oman,0.02,importer_default_high_income,True
+Qatar,Malaysia,0.02,importer_default_high_income,True
+Qatar,India,0.02,importer_default_high_income,True
+Qatar,Singapore,0.02,importer_default_high_income,True
+Qatar,Italy,0.02,importer_default_high_income,True
+Qatar,Spain,0.02,importer_default_high_income,True
+Qatar,Sweden,0.02,importer_default_high_income,True
+Qatar,Brazil,0.02,importer_default_high_income,True
+Qatar,Netherlands,0.02,importer_default_high_income,True
+Qatar,Portugal,0.02,importer_default_high_income,True
+Qatar,United Kingdom,0.02,importer_default_high_income,True
+Qatar,Ireland,0.02,importer_default_high_income,True
+Qatar,South Africa,0.02,importer_default_high_income,True
+Qatar,Kazakhstan,0.02,importer_default_high_income,True
+Qatar,Greece,0.02,importer_default_high_income,True
+Qatar,Malta,0.02,importer_default_high_income,True
+Qatar,Germany,0.02,importer_default_high_income,True
+Qatar,Tunisia,0.02,importer_default_high_income,True
+Qatar,Belgium,0.02,importer_default_high_income,True
+Qatar,Colombia,0.02,importer_default_high_income,True
+Qatar,USA,0.02,importer_default_high_income,True
+Qatar,Finland,0.02,importer_default_high_income,True
+Rep. of Korea,Saudi Arabia,0.02,importer_default_high_income,True
+Rep. of Korea,USA,0.02,importer_default_high_income,True
+Rep. of Korea,United Arab Emirates,0.02,importer_default_high_income,True
+Rep. of Korea,Iraq,0.02,importer_default_high_income,True
+Rep. of Korea,Kuwait,0.02,importer_default_high_income,True
+Rep. of Korea,Qatar,0.02,importer_default_high_income,True
+Rep. of Korea,Australia,0.02,importer_default_high_income,True
+Rep. of Korea,Mexico,0.02,importer_default_high_income,True
+Rep. of Korea,Brazil,0.02,importer_default_high_income,True
+Rep. of Korea,Algeria,0.02,importer_default_high_income,True
+Rep. of Korea,Kazakhstan,0.02,importer_default_high_income,True
+Rep. of Korea,Oman,0.02,importer_default_high_income,True
+Rep. of Korea,United Kingdom,0.02,importer_default_high_income,True
+Rep. of Korea,Nigeria,0.02,importer_default_high_income,True
+Rep. of Korea,Papua New Guinea,0.02,importer_default_high_income,True
+Rep. of Korea,Norway,0.02,importer_default_high_income,True
+Rep. of Korea,Ecuador,0.02,importer_default_high_income,True
+Rep. of Korea,New Zealand,0.02,importer_default_high_income,True
+Rep. of Korea,Indonesia,0.02,importer_default_high_income,True
+Rep. of Korea,Canada,0.02,importer_default_high_income,True
+Rep. of Korea,Mozambique,0.02,importer_default_high_income,True
+Rep. of Korea,Equatorial Guinea,0.02,importer_default_high_income,True
+Rep. of Korea,Philippines,0.02,importer_default_high_income,True
+Rep. of Korea,Malaysia,0.02,importer_default_high_income,True
+Rep. of Korea,Uruguay,0.02,importer_default_high_income,True
+Rep. of Korea,China,0.02,importer_default_high_income,True
+Rep. of Korea,Singapore,0.02,importer_default_high_income,True
+Rep. of Korea,Netherlands,0.02,importer_default_high_income,True
+Rep. of Korea,Senegal,0.02,importer_default_high_income,True
+Rep. of Korea,South Africa,0.02,importer_default_high_income,True
+Rep. of Korea,Belgium,0.02,importer_default_high_income,True
+Rep. of Korea,Spain,0.02,importer_default_high_income,True
+Rep. of Korea,Argentina,0.02,importer_default_high_income,True
+Rep. of Korea,Japan,0.02,importer_default_high_income,True
+Rep. of Moldova,France,0.04,importer_default_upper_middle_income,True
+Romania,Kazakhstan,0.02,importer_default_high_income,True
+Romania,Azerbaijan,0.02,importer_default_high_income,True
+Romania,Guyana,0.02,importer_default_high_income,True
+Romania,Norway,0.02,importer_default_high_income,True
+Romania,Libya,0.02,importer_default_high_income,True
+Romania,Congo,0.02,importer_default_high_income,True
+Romania,Canada,0.02,importer_default_high_income,True
+Romania,Côte d'Ivoire,0.02,importer_default_high_income,True
+Romania,Gabon,0.02,importer_default_high_income,True
+Romania,Rep. of Moldova,0.02,importer_default_high_income,True
+Romania,Ukraine,0.02,importer_default_high_income,True
+Romania,Belgium,0.0,eu_eea_uk_ch_zone,True
+Romania,USA,0.02,importer_default_high_income,True
+Samoa,China,0.04,importer_default_upper_middle_income,True
+Senegal,Nigeria,0.06,importer_default_lower_middle_income,True
+Senegal,Nicaragua,0.06,importer_default_lower_middle_income,True
+Serbia,Iraq,0.04,importer_default_upper_middle_income,True
+Serbia,Kazakhstan,0.04,importer_default_upper_middle_income,True
+Serbia,Azerbaijan,0.04,importer_default_upper_middle_income,True
+Serbia,Libya,0.04,importer_default_upper_middle_income,True
+Serbia,Romania,0.04,importer_default_upper_middle_income,True
+Serbia,Hungary,0.04,importer_default_upper_middle_income,True
+Serbia,"Areas, nes",0.04,importer_default_upper_middle_income,True
+Serbia,USA,0.04,importer_default_upper_middle_income,True
+Singapore,United Arab Emirates,0.005,sg_low_tariff_fta_network,True
+Singapore,USA,0.005,sg_low_tariff_fta_network,True
+Singapore,Qatar,0.005,sg_low_tariff_fta_network,True
+Singapore,Saudi Arabia,0.005,sg_low_tariff_fta_network,True
+Singapore,Brazil,0.005,sg_low_tariff_fta_network,True
+Singapore,Australia,0.005,sg_low_tariff_fta_network,True
+Singapore,Iraq,0.005,sg_low_tariff_fta_network,True
+Singapore,Angola,0.005,sg_low_tariff_fta_network,True
+Singapore,Malaysia,0.005,sg_low_tariff_fta_network,True
+Singapore,Brunei Darussalam,0.005,sg_low_tariff_fta_network,True
+Singapore,Indonesia,0.005,sg_low_tariff_fta_network,True
+Singapore,Congo,0.005,sg_low_tariff_fta_network,True
+Singapore,United Kingdom,0.005,sg_low_tariff_fta_network,True
+Singapore,Papua New Guinea,0.005,sg_low_tariff_fta_network,True
+Singapore,Viet Nam,0.005,sg_low_tariff_fta_network,True
+Singapore,Sudan,0.005,sg_low_tariff_fta_network,True
+Singapore,South Sudan,0.005,sg_low_tariff_fta_network,True
+Singapore,Guyana,0.005,sg_low_tariff_fta_network,True
+Singapore,China,0.005,sg_low_tariff_fta_network,True
+Singapore,New Zealand,0.005,sg_low_tariff_fta_network,True
+Singapore,Ecuador,0.005,sg_low_tariff_fta_network,True
+Singapore,Thailand,0.005,sg_low_tariff_fta_network,True
+Singapore,Nigeria,0.005,sg_low_tariff_fta_network,True
+Singapore,Libya,0.005,sg_low_tariff_fta_network,True
+Singapore,Panama,0.005,sg_low_tariff_fta_network,True
+Singapore,Denmark,0.005,sg_low_tariff_fta_network,True
+Singapore,Pakistan,0.005,sg_low_tariff_fta_network,True
+Singapore,Niger,0.005,sg_low_tariff_fta_network,True
+Singapore,Norway,0.005,sg_low_tariff_fta_network,True
+Singapore,Kuwait,0.005,sg_low_tariff_fta_network,True
+Singapore,Japan,0.005,sg_low_tariff_fta_network,True
+Singapore,Spain,0.005,sg_low_tariff_fta_network,True
+Singapore,Türkiye,0.005,sg_low_tariff_fta_network,True
+Singapore,Mauritius,0.005,sg_low_tariff_fta_network,True
+Singapore,Equatorial Guinea,0.005,sg_low_tariff_fta_network,True
+Singapore,Germany,0.005,sg_low_tariff_fta_network,True
+Singapore,Rep. of Korea,0.005,sg_low_tariff_fta_network,True
+Singapore,Tunisia,0.005,sg_low_tariff_fta_network,True
+Singapore,South Africa,0.005,sg_low_tariff_fta_network,True
+Singapore,"China, Hong Kong SAR",0.005,sg_low_tariff_fta_network,True
+Singapore,Philippines,0.005,sg_low_tariff_fta_network,True
+Singapore,Côte d'Ivoire,0.005,sg_low_tariff_fta_network,True
+Slovakia,Russian Federation,0.02,importer_default_high_income,True
+Slovakia,Azerbaijan,0.02,importer_default_high_income,True
+Slovakia,Norway,0.02,importer_default_high_income,True
+Slovakia,Guyana,0.02,importer_default_high_income,True
+Slovakia,Kazakhstan,0.02,importer_default_high_income,True
+Slovakia,USA,0.02,importer_default_high_income,True
+Slovakia,Libya,0.02,importer_default_high_income,True
+Slovakia,"Other Europe, nes",0.02,importer_default_high_income,True
+Slovakia,Czechia,0.0,eu_eea_uk_ch_zone,True
+Slovakia,Canada,0.02,importer_default_high_income,True
+Slovakia,Israel,0.02,importer_default_high_income,True
+Slovakia,Poland,0.0,eu_eea_uk_ch_zone,True
+Slovakia,Italy,0.0,eu_eea_uk_ch_zone,True
+Slovenia,Austria,0.0,eu_eea_uk_ch_zone,True
+Slovenia,Germany,0.0,eu_eea_uk_ch_zone,True
+Slovenia,Croatia,0.0,eu_eea_uk_ch_zone,True
+Slovenia,Hungary,0.0,eu_eea_uk_ch_zone,True
+South Africa,Nigeria,0.04,importer_default_upper_middle_income,True
+South Africa,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+South Africa,Angola,0.04,importer_default_upper_middle_income,True
+South Africa,USA,0.04,importer_default_upper_middle_income,True
+South Africa,Ghana,0.04,importer_default_upper_middle_income,True
+South Africa,Côte d'Ivoire,0.04,importer_default_upper_middle_income,True
+South Africa,Algeria,0.04,importer_default_upper_middle_income,True
+South Africa,Greece,0.04,importer_default_upper_middle_income,True
+South Africa,Brazil,0.04,importer_default_upper_middle_income,True
+South Africa,United Kingdom,0.04,importer_default_upper_middle_income,True
+South Africa,Türkiye,0.04,importer_default_upper_middle_income,True
+Spain,USA,0.02,importer_default_high_income,True
+Spain,Nigeria,0.02,importer_default_high_income,True
+Spain,Brazil,0.02,importer_default_high_income,True
+Spain,Mexico,0.02,importer_default_high_income,True
+Spain,Libya,0.02,importer_default_high_income,True
+Spain,Angola,0.02,importer_default_high_income,True
+Spain,Saudi Arabia,0.02,importer_default_high_income,True
+Spain,Algeria,0.02,importer_default_high_income,True
+Spain,Kazakhstan,0.02,importer_default_high_income,True
+Spain,Venezuela,0.02,importer_default_high_income,True
+Spain,Guyana,0.02,importer_default_high_income,True
+Spain,Iraq,0.02,importer_default_high_income,True
+Spain,Canada,0.02,importer_default_high_income,True
+Spain,Equatorial Guinea,0.02,importer_default_high_income,True
+Spain,Norway,0.02,importer_default_high_income,True
+Spain,Italy,0.0,eu_eea_uk_ch_zone,True
+Spain,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Spain,Gabon,0.02,importer_default_high_income,True
+Spain,Azerbaijan,0.02,importer_default_high_income,True
+Spain,Albania,0.02,importer_default_high_income,True
+Spain,Ghana,0.02,importer_default_high_income,True
+Spain,Senegal,0.02,importer_default_high_income,True
+Spain,Malta,0.0,eu_eea_uk_ch_zone,True
+Spain,France,0.0,eu_eea_uk_ch_zone,True
+Spain,Tunisia,0.02,importer_default_high_income,True
+Spain,"Other Europe, nes",0.02,importer_default_high_income,True
+Spain,Germany,0.0,eu_eea_uk_ch_zone,True
+Spain,Portugal,0.0,eu_eea_uk_ch_zone,True
+Spain,Belgium,0.0,eu_eea_uk_ch_zone,True
+Spain,Colombia,0.02,importer_default_high_income,True
+Spain,Singapore,0.02,importer_default_high_income,True
+Spain,Togo,0.02,importer_default_high_income,True
+Spain,Peru,0.02,importer_default_high_income,True
+Spain,Côte d'Ivoire,0.02,importer_default_high_income,True
+Spain,Gibraltar,0.02,importer_default_high_income,True
+Sri Lanka,United Arab Emirates,0.06,importer_default_lower_middle_income,True
+Sri Lanka,India,0.06,importer_default_lower_middle_income,True
+Sri Lanka,China,0.06,importer_default_lower_middle_income,True
+Sri Lanka,"China, Hong Kong SAR",0.06,importer_default_lower_middle_income,True
+Sri Lanka,Netherlands,0.06,importer_default_lower_middle_income,True
+Sweden,Norway,0.02,importer_default_high_income,True
+Sweden,USA,0.02,importer_default_high_income,True
+Sweden,United Kingdom,0.0,eu_eea_uk_ch_zone,True
+Sweden,Guyana,0.02,importer_default_high_income,True
+Sweden,Nigeria,0.02,importer_default_high_income,True
+Sweden,Denmark,0.0,eu_eea_uk_ch_zone,True
+Sweden,Libya,0.02,importer_default_high_income,True
+Sweden,Côte d'Ivoire,0.02,importer_default_high_income,True
+Sweden,Germany,0.0,eu_eea_uk_ch_zone,True
+Sweden,Netherlands,0.0,eu_eea_uk_ch_zone,True
+Sweden,Malaysia,0.02,importer_default_high_income,True
+Sweden,Jordan,0.02,importer_default_high_income,True
+Sweden,Peru,0.02,importer_default_high_income,True
+Sweden,Barbados,0.02,importer_default_high_income,True
+Sweden,Iceland,0.0,eu_eea_uk_ch_zone,True
+Switzerland,USA,0.02,importer_default_high_income,True
+Switzerland,Nigeria,0.02,importer_default_high_income,True
+Switzerland,Libya,0.02,importer_default_high_income,True
+Switzerland,Algeria,0.02,importer_default_high_income,True
+Switzerland,Kazakhstan,0.02,importer_default_high_income,True
+Switzerland,France,0.0,eu_eea_uk_ch_zone,True
+Taiwan,Saudi Arabia,0.02,importer_default_high_income,True
+Taiwan,USA,0.02,importer_default_high_income,True
+Taiwan,Kuwait,0.02,importer_default_high_income,True
+Taiwan,United Arab Emirates,0.02,importer_default_high_income,True
+Taiwan,Oman,0.02,importer_default_high_income,True
+Taiwan,Qatar,0.02,importer_default_high_income,True
+Taiwan,Iraq,0.02,importer_default_high_income,True
+Taiwan,Chad,0.02,importer_default_high_income,True
+Taiwan,Norway,0.02,importer_default_high_income,True
+Thailand,United Arab Emirates,0.04,importer_default_upper_middle_income,True
+Thailand,Saudi Arabia,0.04,importer_default_upper_middle_income,True
+Thailand,USA,0.04,importer_default_upper_middle_income,True
+Thailand,Malaysia,0.04,importer_default_upper_middle_income,True
+Thailand,Indonesia,0.04,importer_default_upper_middle_income,True
+Thailand,Australia,0.04,importer_default_upper_middle_income,True
+Thailand,Qatar,0.04,importer_default_upper_middle_income,True
+Thailand,Nigeria,0.04,importer_default_upper_middle_income,True
+Thailand,Brazil,0.04,importer_default_upper_middle_income,True
+Thailand,Libya,0.04,importer_default_upper_middle_income,True
+Thailand,Viet Nam,0.04,importer_default_upper_middle_income,True
+Thailand,Brunei Darussalam,0.04,importer_default_upper_middle_income,True
+Thailand,Congo,0.04,importer_default_upper_middle_income,True
+Thailand,Azerbaijan,0.04,importer_default_upper_middle_income,True
+Thailand,Gabon,0.04,importer_default_upper_middle_income,True
+Thailand,Angola,0.04,importer_default_upper_middle_income,True
+Thailand,Pakistan,0.04,importer_default_upper_middle_income,True
+Thailand,Philippines,0.04,importer_default_upper_middle_income,True
+Thailand,Timor-Leste,0.04,importer_default_upper_middle_income,True
+Thailand,New Zealand,0.04,importer_default_upper_middle_income,True
+Thailand,Oman,0.04,importer_default_upper_middle_income,True
+Thailand,Equatorial Guinea,0.04,importer_default_upper_middle_income,True
+Thailand,Kuwait,0.04,importer_default_upper_middle_income,True
+Thailand,Singapore,0.04,importer_default_upper_middle_income,True
+Thailand,Iraq,0.04,importer_default_upper_middle_income,True
+Thailand,Spain,0.04,importer_default_upper_middle_income,True
+Thailand,"China, Hong Kong SAR",0.04,importer_default_upper_middle_income,True
+Thailand,Norway,0.04,importer_default_upper_middle_income,True
+Thailand,Myanmar,0.04,importer_default_upper_middle_income,True
+Trinidad and Tobago,USA,0.02,importer_default_high_income,True
+Trinidad and Tobago,Jamaica,0.02,importer_default_high_income,True
+Tunisia,Azerbaijan,0.06,importer_default_lower_middle_income,True
+Tunisia,Libya,0.06,importer_default_lower_middle_income,True
+USA,Canada,0.0,bilateral_fta_bloc,True
+USA,Mexico,0.02,importer_default_high_income,True
+USA,Saudi Arabia,0.02,importer_default_high_income,True
+USA,Brazil,0.02,importer_default_high_income,True
+USA,Colombia,0.02,importer_default_high_income,True
+USA,Venezuela,0.02,importer_default_high_income,True
+USA,Iraq,0.02,importer_default_high_income,True
+USA,Guyana,0.02,importer_default_high_income,True
+USA,Nigeria,0.02,importer_default_high_income,True
+USA,Ecuador,0.02,importer_default_high_income,True
+USA,Angola,0.02,importer_default_high_income,True
+USA,United Kingdom,0.02,importer_default_high_income,True
+USA,Libya,0.02,importer_default_high_income,True
+USA,Argentina,0.02,importer_default_high_income,True
+USA,Trinidad and Tobago,0.02,importer_default_high_income,True
+USA,United Arab Emirates,0.02,importer_default_high_income,True
+USA,Kazakhstan,0.02,importer_default_high_income,True
+USA,Ghana,0.02,importer_default_high_income,True
+USA,Kuwait,0.02,importer_default_high_income,True
+USA,Norway,0.02,importer_default_high_income,True
+USA,Algeria,0.02,importer_default_high_income,True
+USA,Cameroon,0.02,importer_default_high_income,True
+USA,Chad,0.02,importer_default_high_income,True
+USA,Guatemala,0.02,importer_default_high_income,True
+USA,Senegal,0.02,importer_default_high_income,True
+USA,Gabon,0.02,importer_default_high_income,True
+USA,Peru,0.02,importer_default_high_income,True
+USA,Poland,0.02,importer_default_high_income,True
+USA,"China, Hong Kong SAR",0.02,importer_default_high_income,True
+USA,Qatar,0.02,importer_default_high_income,True
+Uganda,Singapore,0.08,importer_default_low_income,True
+Uganda,Italy,0.08,importer_default_low_income,True
+Uganda,Denmark,0.08,importer_default_low_income,True
+Ukraine,Latvia,0.06,importer_default_lower_middle_income,True
+United Kingdom,Norway,0.02,importer_default_high_income,True
+United Kingdom,USA,0.02,importer_default_high_income,True
+United Kingdom,Libya,0.02,importer_default_high_income,True
+United Kingdom,Nigeria,0.02,importer_default_high_income,True
+United Kingdom,Guyana,0.02,importer_default_high_income,True
+United Kingdom,Algeria,0.02,importer_default_high_income,True
+United Kingdom,Türkiye,0.02,importer_default_high_income,True
+United Kingdom,Canada,0.02,importer_default_high_income,True
+United Kingdom,Angola,0.02,importer_default_high_income,True
+United Kingdom,Kazakhstan,0.02,importer_default_high_income,True
+United Kingdom,United Arab Emirates,0.02,importer_default_high_income,True
+United Kingdom,Congo,0.02,importer_default_high_income,True
+United Kingdom,Cameroon,0.02,importer_default_high_income,True
+United Kingdom,Brazil,0.02,importer_default_high_income,True
+United Kingdom,Equatorial Guinea,0.02,importer_default_high_income,True
+United Kingdom,Azerbaijan,0.02,importer_default_high_income,True
+United Kingdom,Malaysia,0.02,importer_default_high_income,True
+United Kingdom,Tunisia,0.02,importer_default_high_income,True
+United Kingdom,Liberia,0.02,importer_default_high_income,True
+United Kingdom,Netherlands,0.0,eu_eea_uk_ch_zone,True
+United Rep. of Tanzania,South Africa,0.06,importer_default_lower_middle_income,True
+United Rep. of Tanzania,Poland,0.06,importer_default_lower_middle_income,True
+United Rep. of Tanzania,China,0.06,importer_default_lower_middle_income,True
+Uruguay,Nigeria,0.02,importer_default_high_income,True
+Uruguay,Argentina,0.02,importer_default_high_income,True
+Uruguay,Kazakhstan,0.02,importer_default_high_income,True
+Uruguay,Azerbaijan,0.02,importer_default_high_income,True
+Uruguay,USA,0.02,importer_default_high_income,True
+Uzbekistan,Russian Federation,0.06,importer_default_lower_middle_income,True
+Uzbekistan,Turkmenistan,0.06,importer_default_lower_middle_income,True
+Uzbekistan,Kazakhstan,0.06,importer_default_lower_middle_income,True
+Uzbekistan,Azerbaijan,0.06,importer_default_lower_middle_income,True
+Uzbekistan,Iran,0.06,importer_default_lower_middle_income,True
+Uzbekistan,Iraq,0.06,importer_default_lower_middle_income,True
