@@ -102,15 +102,21 @@ def greedy_solver(network: "SupplyChainNetwork") -> SolverFn:
     return lambda problem: _greedy_adapter(problem, network)
 
 
-def run_comparison(
+def run_solvers(
     network: "SupplyChainNetwork",
     shocks: dict[str, float],
     solvers: dict[str, SolverFn],
     capacity_multiplier: float = 0.3,
     onboarding_cost_multiplier: float = 0.0,
     onboarding_lead_time_days: float = 45.0,
-) -> pd.DataFrame:
+) -> dict[str, SolverResult]:
     """Run every solver in `solvers` against the same rerouting scenario.
+
+    Builds one RerouteProblem and hands it to every solver, so a difference
+    in results reflects the solving method, not the input. Used by
+    run_comparison (below) for its summary table, and directly by callers
+    that need a specific solver's full SolverResult - e.g. to render the
+    winning solver's actual allocations, not just its summary stats.
 
     Args:
         network: loaded SupplyChainNetwork.
@@ -123,11 +129,9 @@ def run_comparison(
             identically to every solver via build_reroute_problem.
 
     Returns:
-        One row per solver: success, objective_value, total_unmet_value_usd,
-        pct_covered, n_new_relationships, runtime_seconds, error. A failing
-        solver (missing dependency, infeasible problem, exception) shows up
-        as a row with success=False rather than raising, so one broken
-        solver doesn't block comparing the others.
+        solver name -> SolverResult. A failing solver (missing dependency,
+        infeasible problem, exception) shows up as success=False rather than
+        raising, so one broken solver doesn't block the others.
     """
 
     built = build_reroute_problem(
@@ -142,7 +146,7 @@ def run_comparison(
 
     problem = built["problem"]
 
-    rows = []
+    results = {}
     for name, solver_fn in solvers.items():
         start = time.perf_counter()
         try:
@@ -155,7 +159,37 @@ def run_comparison(
                 error=str(e),
                 runtime_seconds=round(time.perf_counter() - start, 4),
             )
-        rows.append({
+        results[name] = result
+
+    return results
+
+
+def run_comparison(
+    network: "SupplyChainNetwork",
+    shocks: dict[str, float],
+    solvers: dict[str, SolverFn],
+    capacity_multiplier: float = 0.3,
+    onboarding_cost_multiplier: float = 0.0,
+    onboarding_lead_time_days: float = 45.0,
+) -> pd.DataFrame:
+    """Same as run_solvers, flattened into a one-row-per-solver summary table.
+
+    Returns:
+        One row per solver: success, objective_value, total_unmet_value_usd,
+        pct_covered, n_new_relationships, runtime_seconds, error.
+    """
+
+    results = run_solvers(
+        network,
+        shocks,
+        solvers,
+        capacity_multiplier=capacity_multiplier,
+        onboarding_cost_multiplier=onboarding_cost_multiplier,
+        onboarding_lead_time_days=onboarding_lead_time_days,
+    )
+
+    rows = [
+        {
             "solver": name,
             "success": result.success,
             "objective_value": result.objective_value,
@@ -164,6 +198,8 @@ def run_comparison(
             "n_new_relationships": result.n_new_relationships,
             "runtime_seconds": result.runtime_seconds,
             "error": result.error,
-        })
+        }
+        for name, result in results.items()
+    ]
 
     return pd.DataFrame(rows)

@@ -112,6 +112,7 @@ def solve(problem: RerouteProblem) -> SolverResult:
                 "new_supplier": candidate,
                 "allocated_value_usd": allocated_value_usd,
                 "landed_unit_cost_usd_per_kg": round(arc["unit_cost_usd_per_kg"], 4),
+                "freight_cost_usd_per_kg": arc["freight_cost_usd_per_kg"],
                 "tariff_pct": arc["tariff_pct"],
                 "tariff_methodology": arc["tariff_methodology"],
                 "is_new_trade_relationship": bool(arc["is_new_trade_relationship"]),

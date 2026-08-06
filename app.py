@@ -1,16 +1,55 @@
 """Streamlit front end for the supply chain vulnerability network.
 
+Single-page portfolio view: pick a shock scenario in the sidebar, everything
+below (map, impact metrics, solver comparison, reroute detail) updates from
+that one scenario at once.
+
 Run with: streamlit run app.py
 """
 
-import networkx as nx
+import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
-from pyvis.network import Network
 
+from src.map_viz import COLOR_BLUE, COLOR_GREEN, COLOR_MAGENTA, COLOR_RED, COLOR_YELLOW, build_deck, count_unmappable_edges
+from src.solver_ranking import rank_solvers
+from src.solvers.compare import greedy_solver, run_solvers
+from src.solvers import min_cost_flow, or_tools
 from src.supply_chain_network import SupplyChainNetwork
 
 st.set_page_config(page_title="Supply Chain Vulnerability Mapping", layout="wide")
+
+CENTROIDS_PATH = "data/processed/country_centroids.csv"
+
+st.markdown(
+    f"""
+    <style>
+    .metric-card {{
+        background: rgba(74, 125, 204, 0.08);
+        border-left: 4px solid {COLOR_BLUE};
+        border-radius: 6px;
+        padding: 0.9rem 1.1rem;
+        margin-bottom: 0.6rem;
+    }}
+    .metric-card.danger {{ border-left-color: {COLOR_RED}; background: rgba(230, 31, 31, 0.08); }}
+    .metric-card.warn {{ border-left-color: {COLOR_YELLOW}; background: rgba(252, 202, 51, 0.10); }}
+    .metric-card.good {{ border-left-color: {COLOR_GREEN}; background: rgba(74, 208, 74, 0.08); }}
+    .metric-card .label {{ font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.15rem; }}
+    .metric-card .value {{ font-size: 1.9rem; font-weight: 700; line-height: 1.1; }}
+    .solver-card {{
+        border: 2px solid rgba(128,128,128,0.25);
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        text-align: center;
+    }}
+    .solver-card.winner {{ border-color: {COLOR_GREEN}; background: rgba(74, 208, 74, 0.10); }}
+    .solver-card .name {{ font-size: 1.05rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }}
+    .solver-card .badge {{ color: {COLOR_GREEN}; font-weight: 700; font-size: 0.8rem; }}
+    .solver-card .stat {{ font-size: 1.3rem; font-weight: 700; margin-top: 0.4rem; }}
+    .solver-card .stat-label {{ font-size: 0.75rem; opacity: 0.65; }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 @st.cache_resource
@@ -18,215 +57,170 @@ def load_network() -> SupplyChainNetwork:
     return SupplyChainNetwork(
         edges_path="data/processed/cleaned_edges.csv",
         nodes_path="data/processed/cleaned_nodes.csv",
+        centroids_path=CENTROIDS_PATH,
     )
 
 
 @st.cache_resource
-def get_layout(_g) -> dict:
-    """Fixed node positions computed once from the full network, reused by every
-    panel (before/after/reroute) so nodes never move between views and physics
-    never has to re-settle on rerender."""
-    return nx.spring_layout(_g, seed=42, k=0.6, iterations=200)
+def load_centroids() -> pd.DataFrame:
+    return pd.read_csv(CENTROIDS_PATH)
 
 
-def build_network_viz(g, layout, height="600px"):
-    net = Network(height=height, width="100%", directed=True, notebook=True, cdn_resources="in_line")
-    net.toggle_physics(False)
-
-    for node in g.nodes():
-        attrs = g.nodes[node]
-        raw_value = attrs.get("total_import_value_usd")
-        value = raw_value if raw_value == raw_value else 0  # filters NaN
-        size = 10 + value / 5e6
-        color = "#e74c3c" if attrs.get("is_partner_only") else "#3498db"
-        x, y = layout[node]
-        net.add_node(node, label=node, size=size, color=color, title=str(attrs), x=x * 800, y=y * 800)
-
-    for u, v, attrs in g.edges(data=True):
-        weight = attrs.get("trade_value_usd", 0)
-        net.add_edge(u, v, value=weight / 1e5, title=f"${weight:,.0f}")
-
-    return net.generate_html()
+def metric_card(label: str, value: str, variant: str = "") -> str:
+    css_class = f"metric-card {variant}".strip()
+    return f'<div class="{css_class}"><div class="label">{label}</div><div class="value">{value}</div></div>'
 
 
-def build_reroute_viz(g_after, layout, reroutes, height="600px"):
-    """Same base network as build_network_viz, with rerouted supply overlaid:
-    green solid = extra volume on an existing trade relationship, orange dashed
-    = a brand new trade relationship formed by the reroute."""
-
-    net = Network(height=height, width="100%", directed=True, notebook=True, cdn_resources="in_line")
-    net.toggle_physics(False)
-
-    for node in g_after.nodes():
-        attrs = g_after.nodes[node]
-        raw_value = attrs.get("total_import_value_usd")
-        value = raw_value if raw_value == raw_value else 0  # filters NaN
-        size = 10 + value / 5e6
-        color = "#e74c3c" if attrs.get("is_partner_only") else "#3498db"
-        x, y = layout[node]
-        net.add_node(node, label=node, size=size, color=color, title=str(attrs), x=x * 800, y=y * 800)
-
-    for u, v, attrs in g_after.edges(data=True):
-        weight = attrs.get("trade_value_usd", 0)
-        net.add_edge(u, v, value=weight / 1e5, color="#cccccc", title=f"${weight:,.0f}")
-
-    for reroute in reroutes:
-        importer = reroute["importer"]
-        for alloc in reroute["allocations"]:
-            is_new = alloc["is_new_trade_relationship"]
-            distance = f"{alloc['distance_km']:.0f} km" if alloc["distance_km"] is not None else "unknown"
-            lead_time = (
-                f"{alloc['est_supplier_lead_time_days']:.0f} days"
-                if alloc["est_supplier_lead_time_days"] is not None
-                else "unknown"
-            )
-            title = (
-                f"Rerouted: {importer} <- {alloc['new_supplier']}<br>"
-                f"${alloc['allocated_value_usd']:,.0f} allocated<br>"
-                f"Landed cost: ${alloc['landed_unit_cost_usd_per_kg']:.2f}/kg<br>"
-                f"Tariff: {alloc['tariff_pct'] * 100:.1f}% ({alloc['tariff_methodology']})<br>"
-                f"Distance: {distance}<br>"
-                f"Est. lead time: {lead_time}<br>"
-                f"{'New trade relationship' if is_new else 'Existing trade relationship, increased volume'}"
-            )
-            net.add_edge(
-                importer,
-                alloc["new_supplier"],
-                value=alloc["allocated_value_usd"] / 1e5,
-                color="#e67e22" if is_new else "#27ae60",
-                dashes=is_new,
-                title=title,
-            )
-
-    return net.generate_html()
+def solver_card(row: pd.Series, is_winner: bool) -> str:
+    css_class = "solver-card winner" if is_winner else "solver-card"
+    badge = '<div class="badge">BEST FIT</div>' if is_winner else '<div class="badge">&nbsp;</div>'
+    pct_covered = f"{row['pct_covered']:.1f}%" if pd.notna(row["pct_covered"]) else "N/A"
+    return f"""
+    <div class="{css_class}">
+        {badge}
+        <div class="name">{row['solver'].replace('_', ' ')}</div>
+        <div class="stat">${row['objective_value']:,.0f}</div>
+        <div class="stat-label">landed cost objective</div>
+        <div class="stat">{pct_covered}</div>
+        <div class="stat-label">demand covered</div>
+        <div class="stat">{int(row['n_new_relationships'])}</div>
+        <div class="stat-label">new relationships formed</div>
+    </div>
+    """
 
 
 network = load_network()
-layout = get_layout(network.graph)
+centroids_df = load_centroids()
 
 st.title("Supply Chain Vulnerability Mapping")
-st.caption("Simulate disruptions to a commodity trade network and see the structural and economic impact.")
+st.caption("Simulate a disruption to the global crude oil trade network and see how it ripples through, and how three different optimization methods would reroute around it.")
 
-tab_simulate, tab_rank, tab_reroute = st.tabs(["What-if simulation", "Vulnerability ranking", "Rerouting options"])
-
-with tab_simulate:
-    countries = st.multiselect(
-        "Countries to shock (export ban, plant shutdown, shipping closure, etc.)",
+# --- Sidebar: single control panel driving the whole page ---
+with st.sidebar:
+    st.header("Scenario")
+    shock_countries = st.multiselect(
+        "Suppliers to shock (export ban, plant shutdown, shipping closure, etc.)",
         options=network.countries,
     )
     severity = st.slider(
         "Severity (fraction of export capacity lost)",
-        min_value=0.1, max_value=1.0, value=1.0, step=0.05,
-        help="Applied to every selected country. 1.0 = full export stop. A country's own imports are unaffected.",
-    )
-
-    if st.button("Run simulation", type="primary", disabled=not countries):
-        shocks = {country: severity for country in countries}
-        result = network.simulate_shock(shocks)
-
-        if not result["success"]:
-            st.error(result["error"])
-            for u in result.get("unresolved", []):
-                if u["suggestions"]:
-                    st.write(f"**{u['input']}** — did you mean: {', '.join(u['suggestions'])}?")
-        else:
-            impact = result["impact"]
-
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Trade value lost", f"${impact['trade_value_lost_usd']:,.0f}", f"-{impact['pct_trade_value_lost']}%")
-            col2.metric("Network components", impact["components_after"], impact["components_after"] - impact["components_before"])
-            col3.metric("Largest component size", impact["largest_component_after"], impact["largest_component_after"] - impact["largest_component_before"])
-            col4.metric("Newly isolated countries", len(impact["newly_isolated_countries"]))
-
-            if impact["network_fragmented"]:
-                st.warning("This shock fragments the network into more disconnected components.")
-
-            if impact["newly_isolated_countries"]:
-                st.write("**Newly isolated countries:**", ", ".join(impact["newly_isolated_countries"]))
-
-            gainers = result["centrality_shifts"]["top_gainers"]
-            if gainers:
-                st.subheader("Countries gaining structural importance (risk cascades to)")
-                st.dataframe(gainers, use_container_width=True, hide_index=True)
-
-            g_after = network.shocked_graph(shocks)["graph"]
-
-            col_before, col_after = st.columns(2)
-            with col_before:
-                st.subheader("Before shock")
-                components.html(build_network_viz(network.graph, layout, height="550px"), height=570, scrolling=True)
-            with col_after:
-                st.subheader("After shock")
-                components.html(build_network_viz(g_after, layout, height="550px"), height=570, scrolling=True)
-
-with tab_rank:
-    top_n = st.slider("Number of countries to rank", min_value=5, max_value=len(network.countries), value=10)
-    if st.button("Rank vulnerability"):
-        rows = network.rank_vulnerability(top_n=top_n)
-        st.dataframe(rows, use_container_width=True, hide_index=True)
-
-with tab_reroute:
-    st.caption("Find the best replacement suppliers for the export capacity a shocked supplier loses.")
-
-    reroute_countries = st.multiselect(
-        "Suppliers to shock (export ban, plant shutdown, shipping closure, etc.)",
-        options=network.countries,
-        key="reroute_countries",
-    )
-    reroute_severity = st.slider(
-        "Severity (fraction of export capacity lost)",
-        min_value=0.1, max_value=1.0, value=1.0, step=0.05,
-        help="Applied to every selected supplier. 1.0 = full export stop. Only the displaced fraction needs rerouting.",
-        key="reroute_severity",
+        min_value=0.1, max_value=1.0, value=0.6, step=0.05,
+        help="Applied to every selected country. 1.0 = full export stop.",
     )
     capacity_multiplier = st.slider(
-        "Capacity multiplier",
-        min_value=0.1, max_value=3.0, value=1.0, step=0.1,
-        help="How much additional trade value a replacement supplier can absorb, as a multiple of its current total exports. 1.0 = can at most double its current exports.",
+        "Rerouting capacity multiplier",
+        min_value=0.1, max_value=1.0, value=0.5, step=0.05,
+        help="How much additional trade value a replacement supplier can absorb, as a fraction of its current exports (e.g. 0.5 = up to 50% more).",
     )
 
-    if st.button("Find rerouting options", type="primary", disabled=not reroute_countries):
-        reroute_shocks = {country: reroute_severity for country in reroute_countries}
-        result = network.find_rerouting_options(reroute_shocks, capacity_multiplier=capacity_multiplier)
+shocks = {country: severity for country in shock_countries}
 
-        if not result["success"]:
-            st.error(result["error"])
-            for u in result.get("unresolved", []):
-                if u["suggestions"]:
-                    st.write(f"**{u['input']}** — did you mean: {', '.join(u['suggestions'])}?")
-        else:
-            summary = result["summary"]
+unmappable = count_unmappable_edges(network.graph, centroids_df)
 
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Displaced trade value", f"${summary['total_displaced_value_usd']:,.0f}")
-            col2.metric("% covered by rerouting", f"{summary['pct_covered']:.1f}%" if summary["pct_covered"] is not None else "N/A")
-            col3.metric("Unmet value", f"${summary['total_unmet_value_usd']:,.0f}")
-            col4.metric("New trade relationships", len(summary["new_trade_relationships_formed"]))
+if not shocks:
+    st.info("Select one or more suppliers in the sidebar to simulate a disruption.")
+    st.pydeck_chart(build_deck(network.graph, centroids_df))
+    if unmappable:
+        st.caption(f"{unmappable} trade relationships excluded from the map (no location data).")
+    st.stop()
 
-            if summary["total_unmet_value_usd"] > 0:
-                st.warning(
-                    f"${summary['total_unmet_value_usd']:,.0f} of displaced trade value couldn't be fully "
-                    "rerouted given the current capacity multiplier. Try raising it."
-                )
+shock_result = network.simulate_shock(shocks)
 
-            if summary["new_trade_relationships_formed"]:
-                st.write("**New trade relationships formed:**", ", ".join(summary["new_trade_relationships_formed"]))
+if not shock_result["success"]:
+    st.error(shock_result["error"])
+    for u in shock_result.get("unresolved", []):
+        if u["suggestions"]:
+            st.write(f"**{u['input']}** — did you mean: {', '.join(u['suggestions'])}?")
+    st.stop()
 
-            st.subheader("Rerouted network")
-            st.caption("Gray = existing trade. Green = extra volume on an existing relationship. Orange dashed = a brand new trade relationship.")
-            g_after = network.shocked_graph(reroute_shocks)["graph"]
-            components.html(build_reroute_viz(g_after, layout, result["reroutes"], height="600px"), height=620, scrolling=True)
+impact = shock_result["impact"]
+g_after = network.shocked_graph(shocks)["graph"]
 
-            st.subheader("Rerouting detail by importer")
-            for reroute in result["reroutes"]:
-                header = f"{reroute['importer']} — lost {reroute['removed_supplier']} ({reroute['pct_covered']}% covered)"
-                with st.expander(header):
-                    price_note = (
-                        f" (${reroute['original_unit_price_usd_per_kg']:.2f}/kg)"
-                        if reroute["original_unit_price_usd_per_kg"] is not None else ""
-                    )
-                    st.write(f"Original trade value: ${reroute['original_trade_value_usd']:,.0f}{price_note}")
-                    if reroute["allocations"]:
-                        st.dataframe(reroute["allocations"], use_container_width=True, hide_index=True)
-                    if reroute["unmet_value_usd"] > 0:
-                        st.warning(f"${reroute['unmet_value_usd']:,.0f} unmet")
+# --- Hero: map + big-number impact metrics ---
+st.markdown("## Disruption impact")
+
+map_col, metrics_col = st.columns([2.2, 1])
+with map_col:
+    st.pydeck_chart(build_deck(network.graph, centroids_df, highlight_countries=set(shocks)))
+    st.caption(
+        f"Red = shocked supplier(s) and their affected export flows. "
+        + (f"{unmappable} trade relationships excluded (no location data)." if unmappable else "")
+    )
+with metrics_col:
+    st.markdown(
+        metric_card("Trade value lost", f"${impact['trade_value_lost_usd']:,.0f}", "danger"),
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        metric_card("% of network value lost", f"{impact['pct_trade_value_lost']:.1f}%", "danger"),
+        unsafe_allow_html=True,
+    )
+
+if impact["newly_isolated_countries"]:
+    st.warning("Isolated: " + ", ".join(impact["newly_isolated_countries"]))
+
+gainers = shock_result["centrality_shifts"]["top_gainers"]
+if gainers:
+    with st.expander("Countries gaining structural importance (where risk cascades to)"):
+        st.dataframe(gainers, width="stretch", hide_index=True)
+
+# --- Solver comparison ---
+st.markdown("## Rerouting: which solver finds the best fix?")
+st.caption("Same scenario, three solving methods: a greedy heuristic, an exact min-cost-flow solver, and an exact LP solver (OR-Tools).")
+
+solvers = {
+    "greedy": greedy_solver(network),
+    "min_cost_flow": min_cost_flow.solve,
+    "or_tools": or_tools.solve,
+}
+solver_results = run_solvers(network, shocks, solvers, capacity_multiplier=capacity_multiplier)
+comparison_df = pd.DataFrame([
+    {
+        "solver": name,
+        "success": result.success,
+        "objective_value": result.objective_value,
+        "total_unmet_value_usd": result.total_unmet_value_usd,
+        "pct_covered": result.pct_covered,
+        "n_new_relationships": result.n_new_relationships,
+        "runtime_seconds": result.runtime_seconds,
+        "error": result.error,
+    }
+    for name, result in solver_results.items()
+])
+ranking = rank_solvers(comparison_df)
+
+failed = comparison_df[~comparison_df["success"]]
+if not failed.empty:
+    for _, row in failed.iterrows():
+        st.warning(f"**{row['solver']}** failed: {row['error']}")
+
+if ranking["winner"] is not None:
+    cards_html = '<div style="display:flex; gap:1rem;">'
+    for _, row in ranking["table"].iterrows():
+        cards_html += f'<div style="flex:1;">{solver_card(row, row["solver"] == ranking["winner"])}</div>'
+    cards_html += "</div>"
+    st.markdown(cards_html, unsafe_allow_html=True)
+    st.caption(
+        f"**{ranking['winner'].replace('_', ' ')}** ranks best overall on landed cost, demand coverage, "
+        "and fewest new relationships formed, combined."
+    )
+
+    winner_result = solver_results[ranking["winner"]]
+
+    if winner_result.allocations:
+        st.markdown(f"### Rerouted network ({ranking['winner'].replace('_', ' ')} — winning solver)")
+        st.caption("Gray/blue = unaffected trade. Green = extra volume on an existing relationship. Magenta = a brand new trade relationship.")
+        st.pydeck_chart(build_deck(g_after, centroids_df, reroute_allocations=winner_result.allocations))
+
+        if winner_result.total_unmet_value_usd and winner_result.total_unmet_value_usd > 0:
+            st.warning(
+                f"${winner_result.total_unmet_value_usd:,.0f} of displaced trade value couldn't be fully "
+                "rerouted at the current capacity multiplier. Try raising it in the sidebar."
+            )
+
+        with st.expander("Rerouting detail by importer"):
+            allocations_df = pd.DataFrame(winner_result.allocations)
+            for importer, group in allocations_df.groupby("importer"):
+                total = group["allocated_value_usd"].sum()
+                st.markdown(f"**{importer}** — ${total:,.0f} rerouted")
+                st.dataframe(group.drop(columns=["importer"]), width="stretch", hide_index=True)

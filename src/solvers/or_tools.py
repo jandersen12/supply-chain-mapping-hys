@@ -16,12 +16,23 @@ decision in this version of the problem (no fixed costs or binary
 candidate-selection), so a pure LP - not a MILP - already solves it exactly;
 integer/binary variables would only be needed if a future extension added
 discrete choices (e.g. "use at most N new suppliers").
+
+GLOP does need decision-variable magnitudes to stay reasonably close to the
+objective coefficients, though. demand/supply are raw USD (can run into the
+hundreds of billions for a high-value commodity), while unit costs are
+$/kg (single digits to low tens) - that spread leaves the constraint matrix
+badly conditioned and GLOP returns ABNORMAL instead of solving. VALUE_SCALE
+rescales demand/supply/capacity into millions of USD before building the LP
+so variable and coefficient magnitudes stay in the same neighborhood; the
+solution is scaled back to raw USD afterward.
 """
 
 from ortools.linear_solver import pywraplp
 
 from .compare import SolverResult
 from .problem import RerouteProblem
+
+VALUE_SCALE = 1e-6  # USD -> millions of USD, keeps GLOP well-conditioned
 
 
 def solve(problem: RerouteProblem) -> SolverResult:
@@ -97,15 +108,16 @@ def solve(problem: RerouteProblem) -> SolverResult:
         arcs_by_candidate.setdefault(key[1], []).append(key)
 
     # Demand constraints: allocations + unmet must exactly cover each importer's need.
+    # Values scaled by VALUE_SCALE (see module docstring) to keep GLOP well-conditioned.
     for importer, need in problem.demand.items():
         terms = [x[key] for key in arcs_by_importer.get(importer, [])]
-        solver.Add(solver.Sum(terms) + unmet[importer] == need)
+        solver.Add(solver.Sum(terms) + unmet[importer] == need * VALUE_SCALE)
 
     # Supply constraints: allocations out of each candidate can't exceed its capacity.
     for candidate, capacity in problem.supply.items():
         terms = [x[key] for key in arcs_by_candidate.get(candidate, [])]
         if terms:
-            solver.Add(solver.Sum(terms) <= capacity)
+            solver.Add(solver.Sum(terms) <= capacity * VALUE_SCALE)
 
     unit_cost = {(row.importer, row.candidate): row.unit_cost_usd_per_kg for row in arc_rows}
     objective_terms = [unit_cost[key] * var for key, var in x.items()]
@@ -124,7 +136,7 @@ def solve(problem: RerouteProblem) -> SolverResult:
 
     allocations = []
     for (importer, candidate), var in x.items():
-        value = var.solution_value()
+        value = var.solution_value() / VALUE_SCALE
         if value <= 1e-6:
             continue
         row = arc_lookup[(importer, candidate)]
@@ -133,6 +145,7 @@ def solve(problem: RerouteProblem) -> SolverResult:
             "new_supplier": candidate,
             "allocated_value_usd": round(value, 2),
             "landed_unit_cost_usd_per_kg": round(row.unit_cost_usd_per_kg, 4),
+            "freight_cost_usd_per_kg": row.freight_cost_usd_per_kg,
             "tariff_pct": row.tariff_pct,
             "tariff_methodology": row.tariff_methodology,
             "is_new_trade_relationship": bool(row.is_new_trade_relationship),
@@ -140,7 +153,7 @@ def solve(problem: RerouteProblem) -> SolverResult:
             "est_supplier_lead_time_days": row.est_supplier_lead_time_days,
         })
 
-    total_unmet_value = sum(var.solution_value() for var in unmet.values())
+    total_unmet_value = sum(var.solution_value() for var in unmet.values()) / VALUE_SCALE
     objective_value = sum(
         a["allocated_value_usd"] * a["landed_unit_cost_usd_per_kg"] for a in allocations
     )

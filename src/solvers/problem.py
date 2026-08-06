@@ -18,6 +18,11 @@ baseline (which never tracks physical quantity through its allocation loop,
 only value), kept here rather than "fixed" so solver comparisons are
 apples-to-apples against the existing baseline rather than against a
 different problem.
+
+unit_cost_usd_per_kg = candidate's avg export price * (1 + tariff_pct),
+optionally inflated by onboarding_cost_multiplier for a new relationship,
+plus a distance-based freight cost add-on (see estimate_shipping_cost.py) so
+a farther candidate isn't priced the same as an equally-cheap closer one.
 """
 
 from collections import defaultdict
@@ -27,6 +32,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 from ..estimate_lead_times import estimate_lead_time_days
+from ..estimate_shipping_cost import estimate_freight_cost_usd_per_kg
 from ..estimate_tariffs import estimate_tariff_pct
 
 if TYPE_CHECKING:
@@ -36,6 +42,7 @@ ARC_COLUMNS = [
     "importer",
     "candidate",
     "unit_cost_usd_per_kg",
+    "freight_cost_usd_per_kg",
     "is_new_trade_relationship",
     "tariff_pct",
     "tariff_methodology",
@@ -178,6 +185,7 @@ def build_reroute_problem(
     # detail is kept in `displaced` for reporting only.
     demand: dict[str, float] = defaultdict(float)
     displaced: list[dict[str, Any]] = []
+    self_backfill_exclusions: set[tuple[str, str]] = set()
     for importer, removed_supplier, data, severity in displaced_edges:
         full_value = data.get("trade_value_usd", 0) or 0
         displaced_value = full_value * severity
@@ -186,6 +194,7 @@ def build_reroute_problem(
             full_value / original_qty if original_qty == original_qty and original_qty else None
         )
         demand[importer] += displaced_value
+        self_backfill_exclusions.add((importer, removed_supplier))
         displaced.append({
             "importer": importer,
             "removed_supplier": removed_supplier,
@@ -197,11 +206,13 @@ def build_reroute_problem(
         })
 
     # Arcs: every (importer, candidate) pair with a price basis, excluding
-    # self-loops.
+    # self-loops and a shocked supplier covering the exact relationship its
+    # own shock displaced (it can still serve *other* importers - see
+    # supply_chain_network.py's find_rerouting_options docstring).
     arc_rows = []
     for importer in demand:
         for candidate, unit_price in avg_unit_price.items():
-            if candidate == importer:
+            if candidate == importer or (importer, candidate) in self_backfill_exclusions:
                 continue
 
             if (importer, candidate) in existing_tariffs:
@@ -219,6 +230,9 @@ def build_reroute_problem(
                 unit_cost *= (1 + onboarding_cost_multiplier)
 
             distance_km = network._distance_km(importer, candidate)
+            freight = estimate_freight_cost_usd_per_kg(distance_km)
+            unit_cost += freight["freight_cost_usd_per_kg"]
+
             lead_time = estimate_lead_time_days(
                 distance_km, is_new_relationship, onboarding_lead_time_days
             )
@@ -227,6 +241,7 @@ def build_reroute_problem(
                 "importer": importer,
                 "candidate": candidate,
                 "unit_cost_usd_per_kg": unit_cost,
+                "freight_cost_usd_per_kg": freight["freight_cost_usd_per_kg"],
                 "is_new_trade_relationship": is_new_relationship,
                 "tariff_pct": tariff_pct,
                 "tariff_methodology": tariff_methodology,

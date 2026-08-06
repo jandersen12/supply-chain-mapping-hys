@@ -1,7 +1,7 @@
 """Core supply chain graph service.
 
 Loads the cleaned trade network once and exposes a scenario-simulation method ('simulate_shock') designed
-to be called repeatedl by an LLM as a tool."""
+to be called repeatedly by an LLM as a tool."""
 
 import difflib
 import math
@@ -14,6 +14,7 @@ import networkx as nx
 import pandas as pd
 
 from .estimate_lead_times import estimate_lead_time_days
+from .estimate_shipping_cost import estimate_freight_cost_usd_per_kg
 from .estimate_tariffs import derive_importer_default_rates, estimate_tariff_pct
 
 class SupplyChainNetwork:
@@ -271,11 +272,14 @@ class SupplyChainNetwork:
 
         Rerouting cost is modeled as landed unit cost: a candidate's average
         export unit price (trade_value_usd / trade_qty_kg across its existing
-        trade) times (1 + the tariff the importer would pay that candidate).
-        If the importer already trades with the candidate, the existing
-        estimated_tariff_pct is used; otherwise a tariff is estimated with the
-        same rule engine that produced estimated_tariffs.csv (see
-        estimate_tariffs.py) and flagged as such.
+        trade) times (1 + the tariff the importer would pay that candidate),
+        plus a distance-based freight cost add-on (see
+        estimate_shipping_cost.py) so a farther candidate isn't ranked the
+        same as an equally-priced closer one. If the importer already trades
+        with the candidate, the existing estimated_tariff_pct is used;
+        otherwise a tariff is estimated with the same rule engine that
+        produced estimated_tariffs.csv (see estimate_tariffs.py) and flagged
+        as such.
 
         Forming a brand-new supplier relationship carries real-world friction
         (vendor qualification, contracting, first-shipment setup) that an
@@ -307,9 +311,11 @@ class SupplyChainNetwork:
                 lost, in (0, 1]) - same semantics as simulate_shock. Only
                 the displaced fraction of each affected trade relationship
                 needs rerouting; the retained (1 - severity) portion stays
-                with the existing supplier. A shocked country also remains
-                in the candidate pool as a supplier, at its reduced
-                remaining export value.
+                with the existing supplier. A shocked country remains in the
+                candidate pool as a supplier for *other* importers, at its
+                reduced remaining export value, but can't be chosen to cover
+                the specific relationship its own shock displaced - it
+                shouldn't be able to backfill the exact volume it just lost.
             capacity_multiplier: how much additional trade value, as a
                 multiple of a candidate's current total exports, it can
                 absorb. Default 0.3 means a candidate can at most absorb 30%
@@ -410,7 +416,7 @@ class SupplyChainNetwork:
 
             ranked = []
             for candidate, stats in candidate_stats.items():
-                if candidate == importer or stats["remaining_capacity_usd"] <= 0:
+                if candidate == importer or candidate == removed_supplier or stats["remaining_capacity_usd"] <= 0:
                     continue
 
                 if (importer, candidate) in existing_tariffs:
@@ -428,6 +434,9 @@ class SupplyChainNetwork:
                     landed_unit_cost *= (1 + onboarding_cost_multiplier)
 
                 distance_km = self._distance_km(importer, candidate)
+                freight = estimate_freight_cost_usd_per_kg(distance_km)
+                landed_unit_cost += freight["freight_cost_usd_per_kg"]
+
                 lead_time = estimate_lead_time_days(
                     distance_km, is_new_relationship, onboarding_lead_time_days
                 )
@@ -435,6 +444,7 @@ class SupplyChainNetwork:
                 ranked.append({
                     "candidate": candidate,
                     "landed_unit_cost_usd_per_kg": landed_unit_cost,
+                    "freight_cost_usd_per_kg": freight["freight_cost_usd_per_kg"],
                     "tariff_pct": tariff_pct,
                     "tariff_methodology": tariff_methodology,
                     "is_new_trade_relationship": is_new_relationship,
@@ -463,6 +473,7 @@ class SupplyChainNetwork:
                     "new_supplier": candidate,
                     "allocated_value_usd": round(take, 2),
                     "landed_unit_cost_usd_per_kg": round(candidate_info["landed_unit_cost_usd_per_kg"], 4),
+                    "freight_cost_usd_per_kg": candidate_info["freight_cost_usd_per_kg"],
                     "tariff_pct": candidate_info["tariff_pct"],
                     "tariff_methodology": candidate_info["tariff_methodology"],
                     "is_new_trade_relationship": candidate_info["is_new_trade_relationship"],
