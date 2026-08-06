@@ -1,61 +1,131 @@
-# Supply Chain Vulnerability Mapping and Optimized Solutions Project
+# Supply Chain Vulnerability Mapping
 
-A graph database solution to supply chain analytics and strategic solutions for resilience.
+An interactive tool for finding structural chokepoints in a global trade network and testing how well different optimization strategies recover from losing one.
 
-## Description
+**[Live demo](https://supply-chain-mapping-hys.streamlit.app/) · Run locally: `streamlit run app.py`**
 
-Supply chains have prioritized efficiency and lower upfront costs at the expense of network resilience. This has resulted in supply chain systems that lack the flexibility to respond to global shocks, often leading to inflation and logistical challenges that can take months or years to recover. By creating digital graph database models of commodity supply chains, companies can surface chokepoints in the system and create plans that enable them to respond to shocks with strategic solutions that limit negative impacts. 
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![Streamlit](https://img.shields.io/badge/streamlit-1.51-FF4B4B)
+![NetworkX](https://img.shields.io/badge/networkx-3.6-orange)
 
-This project models the supply chain network for a single commodity to identify critical nodes where failures in the chain would be the most disruptive. Using graph algorithms and optimization techniques, it estimates the cost of rerouting resources when a failure occurs at one of these points. A natural language interface also lets users simulate "what-if" scenarios, helping businesses turn resilience planning into concrete action.
+## Overview
 
+Supply chains optimized for low costs tend to concentrate around a handful of suppliers, which makes them prone to disruption from shocks and slow to recover. This project builds a directed trade-value graph for a single commodity from UN Comtrade data, uses graph theory to identify which countries are structural chokepoints (their removal fragments the network or strands the most trade value), and then simulates a disruption at one of those points to see how three different optimization approaches would reroute around it.
 
-### Data
+The current dataset models **crude oil (HS 2709), 2024**, covering 154 countries and ~1,040 reporter-partner trade relationships. The year 2024 was chosen since it contains the most recent and most complete collection of reported imports by country.
 
-[UN Comtrade Database](https://comtradeplus.un.org/)
+**Try it in the app:** simulate an export shock and watch trade value get displaced, then compare how a greedy heuristic, an exact min-cost-flow solver, and an exact LP solver (OR-Tools) each reroute the lost supply and what costs.
 
-## Structure
+## What it does
+
+1. **Pulls and cleans trade data** from the UN Comtrade API for a chosen commodity, producing a clean edge list (bilateral trade value/quantity) and node list (per-country trade totals).
+2. **Builds a directed graph** (`networkx`) where nodes are countries and edges are import relationships weighted by trade value, with tariff, distance (great circle distance), and freight cost attributes attached.
+3. **Finds chokepoints** using structural graph metrics (articulation points, betweenness/closeness centrality, PageRank, and a systematic node removal vulnerability scan.
+4. **Simulates disruptions**: apply a partial or full export shock to one or more countries and measure trade value lost, newly isolated countries, and where structural importance shifts to.
+5. **Reroutes around the shock** with three interchangeable solvers sharing one problem definition (same arcs, costs, and capacity constraints), so the comparison is apples-to-apples:
+   - **Greedy:** cheapest-available-supplier heuristic.
+   - **Min-cost flow:** (`networkx`) a flow-network formulation that tries to find the cheapest way to send a resource through a directed graph.
+   - **Linear program:** (Google OR-Tools) similar to min-cost-flow except frames the problem as a linear programming problem instead of a flow-based network.
+   - Solvers are ranked on a combined score of landed-cost objective, % of demand covered, and number of new trade relationships required.
+6. **The app is visualized** in a single-page Streamlit app with a world map of the network, key impact metrics, and solver comparisons.
+
+## Methodology notes
+
+Real shipment level cost, tariff, and lead-time data isn't available in the Comtrade dataset since it reports trade value and quantity only, so several inputs are rule-based estimates rather than measured values, and each one is documented and flagged in the data:
+
+- **Tariffs**— priority-ordered rules (bilateral FTA → regional free-trade zone → importer-specific flat rate → income-group default), applied both to build `estimated_tariffs.csv` and, live, to any candidate reroute pair that doesn't already trade.
+- **Freight cost**— a per-km rate anchored to a real VLCC crude-tanker benchmark (~$2.5/barrel over ~18,500km Persian Gulf → Asia).
+- **Lead time** — transit time derived from the distance in kilometers between countries plus a fixed onboarding delay penalty for brand-new trade relationships.
+
+These are called out explicitly in the code and in solver output (`is_placeholder_estimate` / `tariff_methodology` columns) rather than presented as measured figures. These are also real points of development for future iterations of this project, since finding data sources to fill in these metrics would create a more realistic model of the network.
+
+## Design decisions
+
+Two features were built, evaluated, and shelved rather than shipped and can be found in the docs/ folder:
+
+- [`docs/mode_of_transport_investigation.md`](docs/mode_of_transport_investigation.md) — why shipping mode (sea/air/road) was dropped as a graph dimension due to limited data coverage.
+- [`docs/agentic_resilience_planner_shelved.md`](docs/agentic_resilience_planner_shelved.md) — an agentic layer (LLM-driven goal parsing → automated rebalancing search → narrated results) that was built through five phases, then reverted from `main` pending redesign.
+
+## Project structure
 
 ```
-favorita-demand-forecasting/
+supply-chain-mapping-hys/
+├── app.py                          # Streamlit app
 ├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-│   ├── eda.ipynb
-│   └── node_removal_analysis.ipynb
-├── outputs/
-│   ├── figures/
-│   └── results/
+│   ├── raw/                        # Raw UN Comtrade pulls (gitignored)
+│   ├── processed/                  # Cleaned edges/nodes + derived tables
+│   └── archive/                    # Earlier commodity (gallium) pull, kept for reference (gitignored)
 ├── src/
-│   ├── __init__.py
-│   ├── comtradeapi_data.py     # Pulls data from UN Comtrade
-│   ├── data_cleaning.py        # Process raw data + build nodes and edges
-│   ├── supply_chain_network.py # Builds network, calculates key metrics
-│   └── tool_schemas.py         # Tool format for LLM calls
+│   ├── comtradeapi_data.py         # Pulls raw trade data from the UN Comtrade API
+│   ├── data_cleaning.py            # Raw data -> cleaned_edges.csv / cleaned_nodes.csv
+│   ├── generate_country_centroids.py  # Country -> lat/lon lookup for the map
+│   ├── estimate_tariffs.py         # Rule-based tariff estimation
+│   ├── estimate_lead_times.py      # Rule-based lead-time estimation
+│   ├── estimate_shipping_cost.py   # Distance-based freight cost proxy
+│   ├── supply_chain_network.py     # Core graph service: shock simulation, vulnerability ranking, rerouting, greedy algorithm
+│   ├── solver_ranking.py           # Rank-sum scoring across solvers
+│   ├── map_viz.py                  # pydeck world map visualization
+│   ├── tool_schemas.py             # Anthropic tool-calling schema over SupplyChainNetwork (not in use yet)
+│   └── solvers/
+│       ├── problem.py              # Solver-agnostic problem definition (arcs/demand/supply)
+│       ├── compare.py              # Runs all solvers on one scenario, returns comparable results
+│       ├── min_cost_flow.py        # networkx min-cost-flow solver
+│       └── or_tools.py             # OR-Tools LP solver
+├── notebooks/
+│   ├── eda_gallium.ipynb           # Exploratory graph analysis (structure, centrality, communities)
+│   ├── node_removal_analysis.ipynb # Before/after case study on the top structural chokepoint
+│   └── oil_solver.ipynb            # Validation pass after switching commodities to crude oil
+├── docs/                           # Design-decision write-ups (see above)
 ├── tests/
-│   ├── demo.py                 # script to simulate supply_chain_network.py
-├── .gitignore
-├── app.py                      # streamlit interface
-├── README.md
-└── requirements.txt
+│   └── demo.py                     # Scripted walkthrough of SupplyChainNetwork's public API
+├── requirements.txt                # libraries used in development
+└── requirements.txt                # libraries used in deployment
 ```
 
-## Reproducibility
+## Data
 
-**Initial setup**
+Source: [UN Comtrade Database](https://comtradeplus.un.org/) via the Comtrade API (requires a free API key).
 
-1. Clone the repository
-2. Create the following folders inside your cloned repository:
-    - data/processed
-    - data/raw
-3. Ensure you have a UN Comtrade account setup and an API key
-4. Save your API key to a local .env file
+The original exploratory analysis (`notebooks/eda_gallium.ipynb`, `notebooks/node_removal_analysis.ipynb`) was built on gallium trade data since it was a smaller, more concentrated network that demonstrated the chokepoint-analysis methodology due to the gallium trade's reliance on China. The project later pivoted the live app to crude oil, which is a larger network, once the methodology was validated.
 
-**Code**
-Once all of those steps are complete, run the code as follows:
+## Setup
+
+```bash
+git clone <repo-url>
+cd supply-chain-mapping-hys
+pip install -r requirements.txt          # or requirements-dev.txt for notebook/EDA extras
+```
+
+Create a `.env` file in the project root with a UN Comtrade API key:
 
 ```
-pip install -r requirements.txt
+UN_COMTRADE_API_KEY=your_key_here
+```
+
+### Rebuild the data from scratch (optional)
+
+The app ships with processed data already in `data/processed/`, so this step isn't required to run it, but you can use for pulling a fresh Comtrade extract or switching commodities.
+
+```bash
+mkdir -p data/raw data/processed
 python3 src/comtradeapi_data.py
-python3 src/data_cleaning.py data/raw/comtrade_gallium_imports_2025_raw.csv
+python3 src/data_cleaning.py data/raw/<raw_file>.csv
+python3 src/generate_country_centroids.py
+python3 src/estimate_tariffs.py
 ```
+
+### Run the app
+
+```bash
+streamlit run app.py
+```
+
+### Run the demo script
+
+```bash
+python3 -m tests.demo
+```
+
+## Tech stack
+
+`pandas` · `networkx` · `streamlit` · `pydeck` · `Google OR-Tools` · UN Comtrade API
