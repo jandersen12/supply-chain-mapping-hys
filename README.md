@@ -43,7 +43,7 @@ These are called out explicitly in the code and in solver output (`is_placeholde
 
 Two features were built, evaluated, and shelved rather than shipped and can be found in the docs/ folder:
 
-- [`docs/mode_of_transport_investigation.md`](docs/mode_of_transport_investigation.md) — why shipping mode (sea/air/road) was dropped as a graph dimension due to limited data coverage.
+- [`docs/mode_of_transport_investigation.md`](docs/mode_of_transport_investigation.md) — shipping mode (sea/air/road) was dropped as a graph dimension due to limited data coverage.
 - [`docs/agentic_resilience_planner_shelved.md`](docs/agentic_resilience_planner_shelved.md) — an agentic layer (LLM-driven goal parsing → automated rebalancing search → narrated results) that was built through five phases, then reverted from `main` pending redesign.
 
 ## Project structure
