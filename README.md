@@ -62,13 +62,14 @@ supply-chain-mapping-hys/
 │   ├── estimate_tariffs.py         # Rule-based tariff estimation
 │   ├── estimate_lead_times.py      # Rule-based lead-time estimation
 │   ├── estimate_shipping_cost.py   # Distance-based freight cost proxy
-│   ├── supply_chain_network.py     # Core graph service: shock simulation, vulnerability ranking, rerouting, greedy algorithm
+│   ├── supply_chain_network.py     # Core graph service: shock simulation and vulnerability ranking
 │   ├── solver_ranking.py           # Rank-sum scoring across solvers
 │   ├── map_viz.py                  # pydeck world map visualization
 │   └── solvers/
 │       ├── problem.py              # Solver-agnostic problem definition (arcs/demand/supply)
 │       ├── compare.py              # Runs all solvers on one scenario, returns comparable results
 │       ├── min_cost_flow.py        # networkx min-cost-flow solver
+│       ├── greedy.py               # Heuristic greedy algorithm solver
 │       └── or_tools.py             # OR-Tools LP solver
 ├── notebooks/
 │   ├── eda_gallium.ipynb           # Exploratory graph analysis (structure, centrality, communities)
