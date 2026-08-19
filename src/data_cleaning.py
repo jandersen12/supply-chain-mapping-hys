@@ -6,7 +6,7 @@ The cleaning process involves checks for the structural schema, missingness, uni
 Input:
     A raw comtrade export in csv with the standard Comtrade column schema.
 
-OUtput:
+Output:
     cleaned_edges.csv - reporter -> partner trade edges
     cleaned_nodes.csv - one row per country with total reported trade and reporting activity
 """
@@ -38,7 +38,7 @@ def load_raw(paths: list[str]):
 # --- Drop Aggregate Rows ---
 
 COUNTRY_NAME_FIXES = {"Other Asia, nes": "Taiwan"}      # rename for clarity
-EXCLUDED_ENTITIES = {"European Union"}                  # total for EU duplicate totals for its member states
+EXCLUDED_ENTITIES = {"European Union"}                  # total for EU duplicates totals for its member states
 
 
 def filter_edges(df: pd.DataFrame):
@@ -111,6 +111,35 @@ def build_edge_table(clean: pd.DataFrame):
 
     return edges.reset_index(drop=True)
 
+
+def build_node_table(edges: pd.DataFrame):
+    """Construct a node table covering every country that appears as either a reporter or partner."""
+
+    reporters = set(edges['source'].unique())
+    partners = set(edges['target'].unique())
+    all_countries = sorted(reporters | partners)
+
+    reporter_stats = (edges.groupby('source').agg(
+        total_import_value_usd=('trade_value_usd', 'sum'),
+        total_import_qty_kg=('trade_qty_kg', 'sum'),
+        n_partners=('target', 'nunique')
+    ).reset_index().rename(columns={"source":"country"}))
+
+    partner_stats = (edges.groupby("target").agg(
+        n_reporters_sourcing_from=('source', 'nunique'),
+        total_named_as_source_value_usd=("trade_value_usd", "sum")
+    ).reset_index().rename(columns={"target": "country"}))
+
+    nodes = pd.DataFrame({"country": all_countries})
+    nodes = nodes.merge(reporter_stats, on="country", how="left")
+    nodes = nodes.merge(partner_stats, on="country", how="left")
+    nodes["is_reporter"] = nodes["country"].isin(reporters)
+    nodes["is_partner_only"] = ~nodes["is_reporter"]
+
+    return nodes.sort_values("total_import_value_usd", ascending=False, na_position="last").reset_index(drop=True)
+
+
+# --- Calculate distances and tariffs ---
 
 def _haversine_km(lat1, lon1, lat2, lon2):
     """Great-circle distance in km between two lat/lon points (vectorized)."""
@@ -191,34 +220,6 @@ def add_tariffs(edges: pd.DataFrame, tariffs: pd.DataFrame) -> pd.DataFrame:
         )
 
     return edges
-
-
-def build_node_table(edges: pd.DataFrame):
-    """Construct a node table covering every country that appears as either a reporter or partner."""
-
-    reporters = set(edges['source'].unique())
-    partners = set(edges['target'].unique())
-    all_countries = sorted(reporters | partners)
-
-    reporter_stats = (edges.groupby('source').agg(
-        total_import_value_usd=('trade_value_usd', 'sum'),
-        total_import_qty_kg=('trade_qty_kg', 'sum'),
-        n_partners=('target', 'nunique')
-    ).reset_index().rename(columns={"source":"country"}))
-
-    partner_stats = (edges.groupby("target").agg(
-        n_reporters_sourcing_from=('source', 'nunique'),
-        total_named_as_source_value_usd=("trade_value_usd", "sum")
-    ).reset_index().rename(columns={"target": "country"}))
-
-    nodes = pd.DataFrame({"country": all_countries})
-    nodes = nodes.merge(reporter_stats, on="country", how="left")
-    nodes = nodes.merge(partner_stats, on="country", how="left")
-    nodes["is_reporter"] = nodes["country"].isin(reporters)
-    nodes["is_partner_only"] = ~nodes["is_reporter"]
-
-    return nodes.sort_values("total_import_value_usd", ascending=False, na_position="last").reset_index(drop=True)
-
 
 # --- Main pipeline ---
 
