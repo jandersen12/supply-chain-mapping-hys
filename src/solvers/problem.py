@@ -114,7 +114,7 @@ def build_reroute_problem(
     """
 
     if not shocks:
-        return {"success": False, "error": "No shocks provided."}}
+        return {"success": False, "error": "No shocks provided."}
 
     scenario = {
         "shocks": [{"country": c, "severity": s} for c, s in shocks.items()],

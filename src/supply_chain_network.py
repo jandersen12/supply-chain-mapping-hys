@@ -2,7 +2,6 @@
 
 Loads the cleaned trade network once and exposes a scenario-simulation method ('simulate_shock')."""
 
-import difflib
 import math
 
 from collections import defaultdict
