@@ -5,7 +5,6 @@ Demo showing how to call the supply chain network file. either directly, or from
 import json
 
 from src.supply_chain_network import SupplyChainNetwork
-from src.tool_schemas import dispatch_tool_call
 
 if __name__ == "__main__":
     network = SupplyChainNetwork(

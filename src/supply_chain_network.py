@@ -1,7 +1,6 @@
 """Core supply chain graph service.
 
-Loads the cleaned trade network once and exposes a scenario-simulation method ('simulate_shock') designed
-to be called repeatedly by an LLM as a tool."""
+Loads the cleaned trade network once and exposes a scenario-simulation method ('simulate_shock')."""
 
 import difflib
 import math
@@ -52,13 +51,13 @@ class SupplyChainNetwork:
         self.total_trade_value = self._total_value(self.graph)
         self.baseline = self._snapshot(self.graph)
 
-        # Used by find_rerouting_options: each importer's general tariff default
-        # (for estimating tariffs on candidate pairs that don't already trade)
+        # Used by find_rerouting_options: each importer's general tariff default (for estimating tariffs on candidate pairs that don't already trade)
         # and country centroids (for distance between any pair, not just existing edges).
         self._importer_default_rates = derive_importer_default_rates(
             edges[["source", "target", "estimated_tariff_pct", "tariff_methodology"]]
         )
 
+        # Lets rerouting logic compute distance between any two countries for candidate reroute pairs
         centroids_path = Path(centroids_path)
         self._centroids: dict[str, tuple[float, float]] = {}
         if centroids_path.exists():
@@ -70,10 +69,13 @@ class SupplyChainNetwork:
 
     @staticmethod
     def _total_value(g: nx.DiGraph) -> float:
+        """Pulls the trade value from the attribute dictionary (d) from every edge in the graph (g).
+        If it doesn't exist, defaults to 0 instead."""
         return float(sum(d.get("trade_value_usd", 0) for _, _, d in g.edges(data=True)))
 
     @staticmethod
     def _snapshot(g: nx.DiGraph) -> dict[str, Any]:
+        """Returns a snapshot of the graph's (g) key attributes."""
         ccs = list(nx.weakly_connected_components(g)) if g.number_of_nodes() else []
         largest_cc = len(max(ccs, key=len)) if ccs else 0
 
@@ -112,21 +114,20 @@ class SupplyChainNetwork:
         return 2 * 6371.0 * math.asin(math.sqrt(h))
 
 
-    # --- LLM-callable API ---
-
-
     def list_countries(self) -> list[str]:
         """Return every country name known to the graph (for validating/grounding LLM input)."""
         return self.countries
 
+    
+    # --- Shock Simulation Functions ---
+
     def _resolve_shocks(self, shocks: dict[str, float]) -> tuple[dict[str, float], list[dict[str, Any]]]:
         """Resolve and validate a country -> severity shock map.
 
-        Returns (resolved, unresolved). resolved maps canonical country name
-        -> severity. unresolved lists {"input": name, "suggestions": [...]}
-        entries for names that couldn't be matched, and also covers
-        out-of-range severities (reported with empty suggestions) so callers
-        get one consistent error path.
+        Returns (resolved, unresolved).
+        Resolved maps canonical country name -> severity
+        Unresolved lists {"input": name, "suggestions": [...]} entries for names that couldn't be matched, and also covers
+        out-of-range severities (reported with empty suggestions).
         """
 
         resolved: dict[str, float] = {}
@@ -537,3 +538,4 @@ class SupplyChainNetwork:
             )
         rows.sort(key=lambda r: (r["components_after"], r["pct_trade_value_lost"]), reverse=True)
         return rows[:top_n]
+    

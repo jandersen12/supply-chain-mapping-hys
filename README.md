@@ -65,7 +65,6 @@ supply-chain-mapping-hys/
 │   ├── supply_chain_network.py     # Core graph service: shock simulation, vulnerability ranking, rerouting, greedy algorithm
 │   ├── solver_ranking.py           # Rank-sum scoring across solvers
 │   ├── map_viz.py                  # pydeck world map visualization
-│   ├── tool_schemas.py             # Anthropic tool-calling schema over SupplyChainNetwork (not in use yet)
 │   └── solvers/
 │       ├── problem.py              # Solver-agnostic problem definition (arcs/demand/supply)
 │       ├── compare.py              # Runs all solvers on one scenario, returns comparable results
