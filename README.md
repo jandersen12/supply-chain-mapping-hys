@@ -1,6 +1,6 @@
-# Supply Chain Vulnerability Mapping
+# Resilient Supply Chains: A graph-based optimization approach
 
-An interactive tool for finding structural chokepoints in a global trade network and testing how well different optimization strategies recover from losing one.
+An interactive tool for finding chokepoints in a global trade network and testing how well different optimization strategies recover from losing one.
 
 **[Live demo](https://supply-chain-mapping-hys.streamlit.app/) · Run locally: `streamlit run app.py`**
 
@@ -10,11 +10,11 @@ An interactive tool for finding structural chokepoints in a global trade network
 
 ## Overview
 
-Supply chains optimized for low costs tend to concentrate around a handful of suppliers, which makes them prone to disruption from shocks and slow to recover. This project builds a directed trade-value graph for a single commodity from UN Comtrade data, uses graph theory to identify which countries are structural chokepoints (their removal fragments the network or strands the most trade value), and then simulates a disruption at one of those points to see how three different optimization approaches would reroute around it.
+Supply chains optimized for low costs tend to concentrate around a handful of suppliers, which makes them prone to disruption from shocks and slow to recover. This project builds a directed trade-value graph for a single commodity from UN Comtrade data, uses graph theory to identify which nodes are chokepoints, and then simulates a disruption at one of those points to see how different optimization approaches would reroute around it.
 
 The current dataset models **crude oil (HS 2709), 2024**, covering 154 countries and ~1,040 reporter-partner trade relationships. The year 2024 was chosen since it contains the most recent and most complete collection of reported imports by country.
 
-**Try it in the app:** simulate an export shock and watch trade value get displaced, then compare how a greedy heuristic, an exact min-cost-flow solver, and an exact LP solver (OR-Tools) each reroute the lost supply and what costs.
+**Try it in the app:** simulate an export shock and watch trade value get displaced, then compare how a greedy heuristic, an exact min-cost-flow solver, and an exact LP solver (OR-Tools) each reroute the lost supply and what it costs.
 
 ## What it does
 
@@ -107,11 +107,22 @@ UN_COMTRADE_API_KEY=your_key_here
 The app ships with processed data already in `data/processed/`, so this step isn't required to run it, but you can use for pulling a fresh Comtrade extract or switching commodities.
 
 ```bash
+# Outputs raw csv 
 mkdir -p data/raw data/processed
 python3 src/comtradeapi_data.py
+
+# Outputs cleaned nodes and edges csvs
 python3 src/data_cleaning.py data/raw/<raw_file>.csv
+
+# Outputs country centroids and tariff csvs
 python3 src/generate_country_centroids.py
 python3 src/estimate_tariffs.py
+
+# Adds distance_km to cleaned_edges.csv (uses country_centroids.csv)
+python3 src/data_cleaning.py --add-distance
+
+# Adds estimated_tariff_pct to cleaned_edges.csv (uses estimated_tariffs.csv)
+python3 src/data_cleaning.py --add-tariffs
 ```
 
 ### Run the app
