@@ -1,9 +1,9 @@
 """
-Rule-based tariff estimation, and full estimated_tariffs.csv generation.
+Rule-based tariff estimation, and estimated_tariffs.csv generation.
 
 Two functions:
 
-1. estimate_tariff_pct() - applies a small priority-ordered rule set to any
+1. estimate_tariff_pct() applies a small priority-ordered rule set to any
    (importer, partner) pair:
        1. a specific bilateral FTA pair (e.g. USA <-> Canada, 0%)
        2. both countries in the EU/EEA/UK/CH free-trade zone (0%)
@@ -16,8 +16,7 @@ Two functions:
    SupplyChainNetwork.find_rerouting_options() for candidate pairs that don't
    already have a real trade relationship (see supply_chain_network.py).
 
-2. build_tariff_table()/main() - generates a full estimated_tariffs.csv from
-   a cleaned_edges.csv, by applying estimate_tariff_pct() to every
+2. build_tariff_table()/main() generates estimated_tariffs.csv from cleaned_edges.csv by applying estimate_tariff_pct() to every
    (source, target) pair in it. Run directly: `python src/estimate_tariffs.py`.
 """
 
@@ -25,7 +24,7 @@ from pathlib import Path
 
 import pandas as pd
 
-# Countries in our dataset that are members of the EU/EEA/UK/CH free-trade zone.
+# Countries in dataset that are members of the EU/EEA/UK/CH free-trade zone.
 EU_EEA_UK_CH_ZONE = {
     "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia", "Denmark",
     "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Iceland",
@@ -45,10 +44,8 @@ BILATERAL_FTA_PAIRS = {
     frozenset({"USA", "Canada"}): "bilateral_fta_bloc",
 }
 
-# Rough World Bank-style income classification per importer, used to derive a
-# baseline default tariff rate when no more specific rule above applies.
-# Placeholder classification (not pulled live from the World Bank), acts as a proxy and 
-# is not a real customs schedule.
+# Rough World Bank-style income classification per importer
+# use to derive a baseline placeholder tariff rate when no more specific rule above applies
 
 # Countries handled by SPECIAL_IMPORTER_RATES above are omitted
 
@@ -160,24 +157,22 @@ COUNTRY_INCOME_GROUP: dict[str, str] = {
     "Uzbekistan": "lower_middle_income",
 }
 
-# Default tariff rate per income group
+# Default tariff rate per income group based on unweighted simple mean (World Bank)
 
 INCOME_GROUP_DEFAULT_RATES: dict[str, float] = {
     "high_income": 0.02,
     "upper_middle_income": 0.04,
-    "lower_middle_income": 0.06,
-    "low_income": 0.08,
+    "lower_middle_income": 0.08,
+    "low_income": 0.11,
 }
 
 # Fallback for an importer with no income-group classification at all.
-FALLBACK_DEFAULT_RATE = 0.02
+FALLBACK_DEFAULT_RATE = 0.05
 FALLBACK_DEFAULT_METHODOLOGY = "importer_default_unclassified"
 
 
 def income_group_default_rates() -> dict[str, tuple[float, str]]:
-    """Build each importer's default rate directly from
-    COUNTRY_INCOME_GROUP/INCOME_GROUP_DEFAULT_RATES.
-    """
+    """Build each importer's default rate directly from COUNTRY_INCOME_GROUP/INCOME_GROUP_DEFAULT_RATES."""
 
     return {
         country: (INCOME_GROUP_DEFAULT_RATES[group], f"importer_default_{group}")
@@ -188,15 +183,12 @@ def income_group_default_rates() -> dict[str, tuple[float, str]]:
 def derive_importer_default_rates(tariffs: pd.DataFrame) -> dict[str, tuple[float, str]]:
     """Derive each importer's general default rate from a tariff table.
 
-    Expects columns [source, target, estimated_tariff_pct, tariff_methodology]
-    (as found in estimated_tariffs.csv).
+    Expects columns [source, target, estimated_tariff_pct, tariff_methodology] as found in estimated_tariffs.csv.
 
-    Excludes rows explained by a more specific rule (zone or bilateral FTA),
-    then takes the most common remaining rate/methodology per importer.
-    e.g. Egypt -> (0.06, "importer_default_lower_middle_income").
+    Excludes rows explained by a more specific rule (zone or bilateral FTA), then takes the most common remaining rate/methodology per importer.
+    e.g. Egypt -> (0.08, "importer_default_lower_middle_income").
 
-    Used at graph-load time (SupplyChainNetwork.__init__), where the edges
-    already have estimated_tariff_pct/tariff_methodology baked in from
+    Used at graph-load time (SupplyChainNetwork.__init__), where the edges already have estimated_tariff_pct/tariff_methodology baked in from
     build_tariff_table()/add_tariffs().
     """
 
@@ -222,17 +214,14 @@ def load_importer_default_rates(tariffs_path: Path | str) -> dict[str, tuple[flo
 def estimate_tariff_pct(
     importer: str, partner: str, importer_default_rates: dict[str, tuple[float, str]]
 ) -> dict:
-    """Estimate a tariff rate for an (importer, partner) pair using the rule
-    priority: bilateral FTA pair > shared EU/EEA/UK/CH zone > special flat-rate
-    importer > importer's general default.
+    """Estimate a tariff rate for an (importer, partner) pair using the rule priority: 
+        bilateral FTA pair > shared EU/EEA/UK/CH zone > special flat-rate importer > importer's general default.
 
     Args:
         importer: the country recorded as importing the good.
         partner: the country recorded as supplying the good.
-        importer_default_rates: output of income_group_default_rates() (if
-            from-scratch generation) or load_importer_default_rates()/
-            derive_importer_default_rates() (if re-deriving from an
-            existing table).
+        importer_default_rates: output of income_group_default_rates() (if from-scratch generation) 
+            or load_importer_default_rates()/derive_importer_default_rates() (if re-deriving from an existing table).
 
     Returns:
         {"estimated_tariff_pct": float, "tariff_methodology": str, "is_placeholder_estimate": True}
@@ -271,16 +260,13 @@ def estimate_tariff_pct(
 
 
 def build_tariff_table(edges: pd.DataFrame) -> pd.DataFrame:
-    """Generate a full estimated_tariffs.csv table by applying
-    estimate_tariff_pct() to every unique (source, target) pair in `edges`.
+    """Generate a full estimated_tariffs.csv table by applying estimate_tariff_pct() to every unique (source, target) pair in `edges`.
 
     Args:
-        edges: a cleaned_edges.csv-shaped DataFrame with at least
-            "source" and "target" columns.
+        edges: a cleaned_edges.csv-shaped DataFrame with at least "source" and "target" columns.
 
     Returns:
-        One row per unique (source, target) pair: source, target,
-        estimated_tariff_pct, tariff_methodology, is_placeholder_estimate.
+        One row per unique (source, target) pair: source, target, estimated_tariff_pct, tariff_methodology, is_placeholder_estimate.
     """
 
     default_rates = income_group_default_rates()
