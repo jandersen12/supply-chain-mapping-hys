@@ -110,35 +110,21 @@ def build_reroute_problem(
 
     Returns:
         {"success": True, "problem": RerouteProblem} on success, or
-        {"success": False, "error": str, ...} on the same validation
-        failures find_rerouting_options can hit (unknown countries, bad
-        severity, bad capacity_multiplier).
+        {"success": False, "error": str} if shocks is empty.
     """
 
     if not shocks:
-        return {"success": False, "error": "No shocks provided.", "suggestions": []}
-
-    if capacity_multiplier <= 0:
-        return {"success": False, "error": "capacity_multiplier must be > 0.", "suggestions": []}
-
-    resolved, unresolved = network._resolve_shocks(shocks)
-
-    if unresolved:
-        return {
-            "success": False,
-            "error": "One or more country names were not found in the network, or had an invalid severity.",
-            "unresolved": unresolved,
-        }
+        return {"success": False, "error": "No shocks provided."}}
 
     scenario = {
-        "shocks": [{"country": c, "severity": s} for c, s in resolved.items()],
+        "shocks": [{"country": c, "severity": s} for c, s in shocks.items()],
         "capacity_multiplier": capacity_multiplier,
         "onboarding_cost_multiplier": onboarding_cost_multiplier,
         "onboarding_lead_time_days": onboarding_lead_time_days,
     }
 
     all_edges = list(network.graph.edges(data=True))
-    displaced_edges = [(u, v, d, resolved[v]) for u, v, d in all_edges if v in resolved]
+    displaced_edges = [(u, v, d, shocks[v]) for u, v, d in all_edges if v in shocks]
 
     if not displaced_edges:
         return {
@@ -158,7 +144,7 @@ def build_reroute_problem(
     export_value_by_supplier: dict[str, float] = defaultdict(float)
     export_qty_by_supplier: dict[str, float] = defaultdict(float)
     for _, target, data in all_edges:
-        retained = 1 - resolved.get(target, 0.0)
+        retained = 1 - shocks.get(target, 0.0)
         if retained <= 0:
             continue
         export_value_by_supplier[target] += (data.get("trade_value_usd", 0) or 0) * retained

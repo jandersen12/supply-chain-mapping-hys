@@ -87,17 +87,6 @@ class SupplyChainNetwork:
             "total_trade_value_usd": round(SupplyChainNetwork._total_value(g), 2)
         }
 
-    def _resolve_country(self, name: str) -> tuple[str | None, list[str]]:
-        """Exact match, case-insensitive match, or fuzzy suggestions."""
-        if name in self.graph.nodes:
-            return name, []
-
-        lower_map = {c.lower(): c for c in self.countries}
-        if name.lower() in lower_map:
-            return lower_map[name.lower()], []
-
-        suggestions = difflib.get_close_matches(name, self.countries, n=3, cutoff=0.6)
-        return None, suggestions
 
     def _distance_km(self, a: str, b: str) -> float | None:
         """Great-circle distance between two countries' centroids, or None if either is missing."""
@@ -121,37 +110,13 @@ class SupplyChainNetwork:
     
     # --- Shock Simulation Functions ---
 
-    def _resolve_shocks(self, shocks: dict[str, float]) -> tuple[dict[str, float], list[dict[str, Any]]]:
-        """Resolve and validate a country -> severity shock map.
-
-        Returns (resolved, unresolved).
-        Resolved maps canonical country name -> severity
-        Unresolved lists {"input": name, "suggestions": [...]} entries for names that couldn't be matched, and also covers
-        out-of-range severities (reported with empty suggestions).
-        """
-
-        resolved: dict[str, float] = {}
-        unresolved: list[dict[str, Any]] = []
-
-        for name, severity in shocks.items():
-            match, suggestions = self._resolve_country(name)
-            if not match:
-                unresolved.append({"input": name, "suggestions": suggestions})
-            elif not (0 < severity <= 1):
-                unresolved.append({"input": name, "suggestions": [], "error": "severity must be > 0 and <= 1"})
-            else:
-                resolved[match] = severity
-
-        return resolved, unresolved
-
     @staticmethod
-    def _apply_shocks(g: nx.DiGraph, resolved: dict[str, float]) -> nx.DiGraph:
-        """Return a copy of g with each resolved country's export edges scaled
-        down by its severity (edges scaled to zero are dropped)."""
+    def _apply_shocks(g: nx.DiGraph, shocks: dict[str, float]) -> nx.DiGraph:
+        """Return a copy of g with each country's export edges scaled down by its severity (edges scaled to zero are dropped)."""
 
         g_after = g.copy()
         edges_to_drop = []
-        for country, severity in resolved.items():
+        for country, severity in shocks.items():
             retained = 1 - severity
             for u, v, data in g_after.in_edges(country, data=True):
                 if retained <= 0:
@@ -164,46 +129,33 @@ class SupplyChainNetwork:
         g_after.remove_edges_from(edges_to_drop)
         return g_after
 
+
     def shocked_graph(self, shocks: dict[str, float]) -> dict[str, Any]:
-        """Resolve and validate `shocks`, then return the post-shock graph.
+        """Return the post-shock graph for a validated country -> severity shock map.
 
         Exposed separately from simulate_shock so callers that just need the
         graph for visualization (e.g. app.py) don't have to duplicate the
         shock-application logic.
 
-        Returns {"success": True, "graph": nx.DiGraph, "resolved": {...}} or
-        {"success": False, "error": str, "unresolved": [...]}.
+        Returns {"success": True, "graph": nx.DiGraph, "shocks": {...}} or {"success": False, "error": str}.
         """
 
         if not shocks:
-            return {"success": False, "error": "No shocks provided.", "unresolved": []}
+            return {"success": False, "error": "No shocks provided."}
 
-        resolved, unresolved = self._resolve_shocks(shocks)
-        if unresolved:
-            return {"success": False, "error": "One or more country names were not found in the network, or had an invalid severity.", "unresolved": unresolved}
+        return {"success": True, "graph": self._apply_shocks(self.graph, shocks), "shocks": shocks}
 
-        return {"success": True, "graph": self._apply_shocks(self.graph, resolved), "resolved": resolved}
 
     def simulate_shock(self, shocks: dict[str, float]) -> dict[str, Any]:
         """
-        Simulate one or more countries losing export capacity - an export
-        ban, plant shutdown, shipping corridor closure, etc.
+        Simulate one or more countries losing export capacity.
 
-        Rather than deleting a country from the network (which would also
-        wipe out everything it imports - unrealistic for most disruptions),
-        this scales down the trade_value_usd/trade_qty_kg of its outgoing
-        (export) edges by its severity. A country that loses 100% of its
-        export capacity still shows up as an importer; it just stops
-        supplying anyone. Edges scaled to zero are dropped from the
-        after-shock graph so structural stats (components, isolation) still
-        behave sensibly.
+        The function scales down the trade_value_usd/trade_qty_kg of its outgoing (export) edges by its severity. 
+        A country that loses 100% of its export capacity still shows up as an importer, it just stops supplying anyone. 
+        Edges scaled to zero are dropped from the after-shock graph so structural stats (components, isolation) still work.
 
         Args:
-            shocks: country name -> severity, where severity is the fraction
-                of that country's export capacity lost, in (0, 1]. E.g.
-                {"USA": 0.4} models the USA's exports dropping 40%;
-                {"USA": 1.0} models a full export stop (the old "removal"
-                behavior, from the export side only).
+            shocks: country name -> severity, where severity is the fraction of that country's export capacity lost.
 
         Returns:
             A JSON-serializable dict.
@@ -214,13 +166,13 @@ class SupplyChainNetwork:
 
         built = self.shocked_graph(shocks)
         if not built["success"]:
-            return {"success": False, "error": built["error"], "unresolved": built["unresolved"]}
+            return {"success": False, "error": built["error"]}
 
-        resolved = built["resolved"]
+        shocks = built["shocks"]
         g_after = built["graph"]
         after = self._snapshot(g_after)
 
-        # Save key meetrics
+        # Save key metrics
         value_lost = round(self.baseline["total_trade_value_usd"] - after["total_trade_value_usd"], 2)
         pct_value_lost = round(value_lost / self.baseline["total_trade_value_usd"] * 100, 2)
         isolated = sorted(n for n in g_after.nodes() if g_after.degree(n) == 0)
@@ -240,7 +192,7 @@ class SupplyChainNetwork:
         return {
             "success": True,
             "error": None,
-            "scenario": {"shocks": [{"country": c, "severity": s} for c, s in resolved.items()]},
+            "scenario": {"shocks": [{"country": c, "severity": s} for c, s in shocks.items()]},
             "baseline": self.baseline,
             "after_removal": after,
             "impact": {
@@ -254,7 +206,7 @@ class SupplyChainNetwork:
                 "newly_isolated_countries": isolated,
             },
             "centrality_shifts": {
-                "description": "Countries gaining structural importance (betweenness centrality) after the shock, i.e. where risk cascades to.",
+                "description": "Countries where risk cascades to after shock (higher betweeeness centrality than before).",
                 "top_gainers": shifts[:5],
             },
         }
@@ -337,20 +289,16 @@ class SupplyChainNetwork:
         """
 
         if not shocks:
-            return {"success": False, "error": "No shocks provided.", "suggestions": []}
+            return {"success": False, "error": "No shocks provided."}
 
         if capacity_multiplier <= 0:
-            return {"success": False, "error": "capacity_multiplier must be > 0.", "suggestions": []}
+            return {"success": False, "error": "capacity_multiplier must be > 0."}
 
-        resolved, unresolved = self._resolve_shocks(shocks)
 
-        if unresolved:
-            return {"success": False, "error": "One or more country names were not found in the network, or had an invalid severity.", "unresolved": unresolved}
-
-        scenario_shocks = [{"country": c, "severity": s} for c, s in resolved.items()]
+        scenario_shocks = [{"country": c, "severity": s} for c, s in shocks.items()]
 
         all_edges = list(self.graph.edges(data=True))
-        displaced = [(u, v, d, resolved[v]) for u, v, d in all_edges if v in resolved]
+        displaced = [(u, v, d, shocks[v]) for u, v, d in all_edges if v in shocks]
 
         if not displaced:
             return {
@@ -374,7 +322,7 @@ class SupplyChainNetwork:
         export_value_by_supplier: dict[str, float] = defaultdict(float)
         export_qty_by_supplier: dict[str, float] = defaultdict(float)
         for _, target, data in all_edges:
-            retained = 1 - resolved.get(target, 0.0)
+            retained = 1 - shocks.get(target, 0.0)
             if retained <= 0:
                 continue
             export_value_by_supplier[target] += (data.get("trade_value_usd", 0) or 0) * retained

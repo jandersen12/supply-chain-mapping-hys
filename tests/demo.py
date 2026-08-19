@@ -16,8 +16,8 @@ if __name__ == "__main__":
     result = network.simulate_shock({"USA": 1.0})
     print(json.dumps(result, indent=2))
 
-    print("\n=== Partial shock: 'usa' loses 40%, 'Japan' loses 100% (case-insensitive, multi-node) ===")
-    result = network.simulate_shock({"usa": 0.4, "Japan": 1.0})
+    print("\n=== Partial shock: 'Saudi Arabia' loses 40% of exports ===")
+    result = network.simulate_shock({"Saudi Arabia": 0.4})
     print(json.dumps(result["impact"], indent=2))
 
     print("\n=== Open-ended: rank_vulnerability ===")
