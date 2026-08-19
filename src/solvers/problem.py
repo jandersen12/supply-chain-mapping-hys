@@ -2,7 +2,7 @@
 Solver-agnostic input contract for rerouting-optimization experiments.
 
 build_reroute_problem() extracts the same displaced-relationship / candidate-
-cost setup used by SupplyChainNetwork.find_rerouting_options (the greedy
+cost setup used by solvers.greedy.solve (the greedy
 baseline) into a plain, framework-agnostic structure - arcs, demand, supply -
 that any solver (networkx min_cost_flow, OR-Tools, Gurobi, stochastic) can
 consume identically. This is what makes solver comparisons fair: every solver
@@ -10,7 +10,7 @@ sees the exact same costs, capacities, and constraints; they just search over
 them differently.
 
 Flow unit: every quantity here (demand, supply, allocations) is trade value
-in USD, not physical quantity - the same convention find_rerouting_options
+in USD, not physical quantity - the same convention greedy.solve
 already uses. unit_cost_usd_per_kg is a $/kg price, used as a per-unit-of-flow
 cost weight for ranking/optimization even though the flow itself is measured
 in dollars, not kg. That's an inherited simplification from the greedy

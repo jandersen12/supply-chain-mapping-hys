@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING, Any, Callable
 
 import pandas as pd
 
+from . import greedy
 from .problem import RerouteProblem, build_reroute_problem
 
 if TYPE_CHECKING:
@@ -56,16 +57,17 @@ SolverFn = Callable[[RerouteProblem], SolverResult]
 
 
 def _greedy_adapter(problem: RerouteProblem, network: "SupplyChainNetwork") -> SolverResult:
-    """Wraps the existing find_rerouting_options as a SolverResult.
+    """Wraps greedy.solve as a SolverResult.
 
-    Reruns find_rerouting_options rather than consuming problem.arcs
-    directly, since greedy owns its own sequential capacity-depletion loop
-    (see supply_chain_network.py) rather than a flat arc list. It's still a
-    fair comparison point: same network, same scenario params, so the same
+    Reruns greedy.solve rather than consuming problem.arcs directly, since
+    greedy owns its own sequential capacity-depletion loop (see
+    solvers/greedy.py) rather than a flat arc list. It's still a fair
+    comparison point: same network, same scenario params, so the same
     inputs an exact solver would see via `problem`.
     """
 
-    result = network.find_rerouting_options(
+    result = greedy.solve(
+        network,
         {s["country"]: s["severity"] for s in problem.scenario["shocks"]},
         capacity_multiplier=problem.scenario["capacity_multiplier"],
         onboarding_cost_multiplier=problem.scenario["onboarding_cost_multiplier"],

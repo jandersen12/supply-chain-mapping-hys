@@ -7,7 +7,7 @@ Formulates RerouteProblem as a classic unbalanced transportation problem:
     - candidates forward flow to importers at their landed unit cost
     - a dummy "unmet demand" path (very high cost) guarantees the flow
       problem is always feasible even when total supply < total demand,
-      mirroring find_rerouting_options' willingness to leave some displaced
+      mirroring greedy.solve's willingness to leave some displaced
       value uncovered rather than failing outright
 
 networkx's network_simplex requires integer demands/capacities/weights, so

@@ -13,8 +13,8 @@ Two functions:
           rough World Bank-style income classification (see
           COUNTRY_INCOME_GROUP below)
    Used both to generate the tariffs table below and then again at graph-load time, by
-   SupplyChainNetwork.find_rerouting_options() for candidate pairs that don't
-   already have a real trade relationship (see supply_chain_network.py).
+   solvers.greedy.solve() for candidate pairs that don't
+   already have a real trade relationship (see solvers/greedy.py).
 
 2. build_tariff_table()/main() generates estimated_tariffs.csv from cleaned_edges.csv by applying estimate_tariff_pct() to every
    (source, target) pair in it. Run directly: `python src/estimate_tariffs.py`.
