@@ -24,7 +24,7 @@ OUTPUT_DIR = Path("data/processed")
 
 # Approximate geographic centroid (decimal degrees) for each country, keyed on
 # the name as it should appear in the output file. 
-#
+
 # Two partner categories left out: "Areas, nes" and "Other Europe, nes" are 
 # undisclosed-partner residual categories, not real countries. They're left to
 # fall through to add_distance_km's NaN handling.
@@ -193,9 +193,9 @@ ALIASES = {
     "Hong Kong SAR": "China, Hong Kong SAR",
     "Turkey": "Türkiye",
     "Czech Republic": "Czechia",
-    # Comtrade reports Taiwan under the "Other Asia, nes" label; data_cleaning.py
-    # renames it to "Taiwan" before this script ever sees it, but both aliases
-    # are kept here in case this script is ever run against older raw data.
+    # Comtrade reports Taiwan under the "Other Asia, nes" label
+    # data_cleaning.py renames it to "Taiwan" before this script ever sees it
+    # both aliases are kept here in case this script is ever run against older raw data.
     "Other Asia, nes": "Taiwan",
     "Chinese Taipei": "Taiwan",
     "Russia": "Russian Federation",
@@ -235,8 +235,7 @@ def build_centroids_table(country_names: set[str]) -> pd.DataFrame:
 
     if unmatched:
         print(
-            f"Warning: no centroid found for {len(unmatched)} countr"
-            f"{'y' if len(unmatched) == 1 else 'ies'}: {unmatched}",
+            f"Warning: no centroid found for {len(unmatched)} countries",
             file=sys.stderr,
         )
 
