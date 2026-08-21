@@ -152,6 +152,8 @@ def build_reroute_problem(
     arc_rows = []
     for importer in demand:
         for candidate, unit_price in avg_unit_price.items():
+            if candidate == importer:
+                continue
 
             if (importer, candidate) in existing_tariffs:
                 tariff_pct = existing_tariffs[(importer, candidate)]

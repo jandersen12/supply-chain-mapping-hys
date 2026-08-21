@@ -12,8 +12,8 @@ import streamlit as st
 
 from src.map_viz import COLOR_BLUE, COLOR_GREEN, COLOR_MAGENTA, COLOR_RED, COLOR_YELLOW, build_deck, count_unmappable_edges
 from src.solver_ranking import rank_solvers
-from src.solvers.compare import greedy_solver, run_solvers
-from src.solvers import min_cost_flow, or_tools
+from src.solvers.compare import run_solvers
+from src.solvers import greedy, min_cost_flow, or_tools
 from src.supply_chain_network import SupplyChainNetwork
 
 st.set_page_config(page_title="Supply Chain Vulnerability Mapping", layout="wide")
@@ -169,7 +169,7 @@ st.markdown("## Rerouting: which solver finds the best fix?")
 st.caption("Same scenario, three solving methods: a greedy heuristic, an exact min-cost-flow solver, and an exact LP solver (OR-Tools).")
 
 solvers = {
-    "greedy": greedy_solver(network),
+    "greedy": greedy.solve,
     "min_cost_flow": min_cost_flow.solve,
     "or_tools": or_tools.solve,
 }

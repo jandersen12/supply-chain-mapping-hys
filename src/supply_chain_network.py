@@ -47,8 +47,6 @@ class SupplyChainNetwork:
         self.total_trade_value = self._total_value(self.graph)
         self.baseline = self._snapshot(self.graph)
 
-        # Used by find_rerouting_options: each importer's general tariff default (for estimating tariffs on candidate pairs that don't already trade)
-        # and country centroids (for distance between any pair, not just existing edges).
         self._importer_default_rates = derive_importer_default_rates(
             edges[["source", "target", "estimated_tariff_pct", "tariff_methodology"]]
         )

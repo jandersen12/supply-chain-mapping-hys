@@ -19,7 +19,6 @@ from typing import TYPE_CHECKING, Any, Callable
 
 import pandas as pd
 
-from . import greedy
 from .problem import RerouteProblem, build_reroute_problem
 
 if TYPE_CHECKING:
@@ -55,53 +54,6 @@ class SolverResult:
 
 SolverFn = Callable[[RerouteProblem], SolverResult]
 
-
-def _greedy_adapter(problem: RerouteProblem, network: "SupplyChainNetwork") -> SolverResult:
-    """Wraps greedy.solve as a SolverResult.
-
-    Reruns greedy.solve rather than consuming problem.arcs directly, since
-    greedy owns its own sequential capacity-depletion loop (see
-    solvers/greedy.py) rather than a flat arc list. It's still a fair
-    comparison point: same network, same scenario params, so the same
-    inputs an exact solver would see via `problem`.
-    """
-
-    result = greedy.solve(
-        network,
-        {s["country"]: s["severity"] for s in problem.scenario["shocks"]},
-        capacity_multiplier=problem.scenario["capacity_multiplier"],
-        onboarding_cost_multiplier=problem.scenario["onboarding_cost_multiplier"],
-        onboarding_lead_time_days=problem.scenario["onboarding_lead_time_days"],
-    )
-    if not result["success"]:
-        return SolverResult(solver_name="greedy", success=False, error=result.get("error"))
-
-    allocations = [
-        {"importer": r["importer"], **alloc}
-        for r in result["reroutes"]
-        for alloc in r["allocations"]
-    ]
-    objective_value = sum(
-        a["allocated_value_usd"] * a["landed_unit_cost_usd_per_kg"] for a in allocations
-    )
-
-    return SolverResult(
-        solver_name="greedy",
-        success=True,
-        allocations=allocations,
-        objective_value=round(objective_value, 2),
-        total_unmet_value_usd=result["summary"]["total_unmet_value_usd"],
-        pct_covered=result["summary"]["pct_covered"],
-        n_new_relationships=len(result["summary"]["new_trade_relationships_formed"]),
-    )
-
-
-def greedy_solver(network: "SupplyChainNetwork") -> SolverFn:
-    """Returns a solve(problem) function bound to this network, for
-    inclusion in the `solvers` dict passed to run_comparison, e.g.
-    solvers={"greedy": greedy_solver(network), "min_cost_flow": ...}.
-    """
-    return lambda problem: _greedy_adapter(problem, network)
 
 
 def run_solvers(
