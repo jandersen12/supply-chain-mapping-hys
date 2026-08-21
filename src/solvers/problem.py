@@ -1,28 +1,11 @@
 """
 Solver-agnostic input contract for rerouting-optimization experiments.
 
-build_reroute_problem() extracts the same displaced-relationship / candidate-
-cost setup used by solvers.greedy.solve (the greedy
-baseline) into a plain, framework-agnostic structure - arcs, demand, supply -
-that any solver (networkx min_cost_flow, OR-Tools, Gurobi, stochastic) can
-consume identically. This is what makes solver comparisons fair: every solver
-sees the exact same costs, capacities, and constraints; they just search over
-them differently.
+build_reroute_problem() extracts the same arcs, demand, and supply features that any solver can use as input.
 
-Flow unit: every quantity here (demand, supply, allocations) is trade value
-in USD, not physical quantity - the same convention greedy.solve
-already uses. unit_cost_usd_per_kg is a $/kg price, used as a per-unit-of-flow
-cost weight for ranking/optimization even though the flow itself is measured
-in dollars, not kg. That's an inherited simplification from the greedy
-baseline (which never tracks physical quantity through its allocation loop,
-only value), kept here rather than "fixed" so solver comparisons are
-apples-to-apples against the existing baseline rather than against a
-different problem.
-
-unit_cost_usd_per_kg = candidate's avg export price * (1 + tariff_pct),
-optionally inflated by onboarding_cost_multiplier for a new relationship,
-plus a distance-based freight cost add-on (see estimate_shipping_cost.py) so
-a farther candidate isn't priced the same as an equally-cheap closer one.
+unit_cost_usd_per_kg = candidate's avg export price * (1 + tariff_pct) 
+plus a distance-based freight cost add-on (see estimate_shipping_cost.py).
+onboarding_cost_multiplier is applied for any new relationships. 
 """
 
 from collections import defaultdict
@@ -56,24 +39,11 @@ class RerouteProblem:
     """Solver-agnostic definition of a rerouting-optimization problem.
 
     Attributes:
-        scenario: echoes every input parameter (shocks and each
-            cost/capacity knob), for traceability in solver output.
-        displaced: one entry per (importer, removed_supplier) relationship
-            that needs replacement supply - kept separate from `demand`
-            (which aggregates by importer) purely for reporting, so results
-            can still be attributed back to which removed supplier each
-            importer lost.
-        demand: importer -> total trade value (USD) needing replacement,
-            summed across every removed supplier that importer lost. A
-            solver doesn't need the per-removed-supplier split to allocate -
-            any remaining candidate can cover any of an importer's lost
-            volume - so this is aggregated, unlike `displaced`.
-        supply: candidate -> capacity (USD) it can absorb in *additional*
-            rerouted trade (current export value x capacity_multiplier).
-        arcs: every feasible (importer, candidate) pair with its cost and
-            descriptive attributes - one row per pair, not per unit of flow.
-            Capacity/demand constraints live in `supply`/`demand`, not on
-            individual arcs.
+        scenario: input shock and capacity parameters.
+        displaced: detailed one entry per (importer, removed_supplier) relationship that needs replacement supply.
+        demand: importer -> total trade value (USD) needing replacement, summed across every removed supplier that importer lost. 
+        supply: candidate -> capacity (USD) it can absorb in additional rerouted trade (current export value x capacity_multiplier).
+        arcs: one row per pair every feasible (importer, candidate) pair with its cost and descriptive attributes.
     """
 
     scenario: dict[str, Any]
@@ -92,21 +62,10 @@ def build_reroute_problem(
 ) -> dict[str, Any]:
     """Build a RerouteProblem from the network for the given shock scenario.
 
-    Mirrors find_rerouting_options' setup logic (displaced relationships,
-    candidate cost/capacity, tariff lookup) but stops short of actually
-    solving - it hands back the plain arcs/demand/supply structure every
-    solver should consume, so they're all optimizing over identical inputs.
-
     Args:
         network: a loaded SupplyChainNetwork.
-        shocks: country name -> severity (fraction of export capacity lost,
-            in (0, 1]) - same semantics as find_rerouting_options. Only the
-            displaced fraction of each affected relationship becomes demand;
-            a shocked country stays in the candidate pool at its reduced
-            remaining export value.
-        capacity_multiplier, onboarding_cost_multiplier,
-            onboarding_lead_time_days: same semantics and defaults as
-            find_rerouting_options.
+        shocks: country name -> severity (fraction of export capacity lost in (0, 1])
+        capacity_multiplier, onboarding_cost_multiplier, onboarding_lead_time_days
 
     Returns:
         {"success": True, "problem": RerouteProblem} on success, or
@@ -138,20 +97,19 @@ def build_reroute_problem(
             ),
         }
 
-    # Candidate supply: same aggregation as find_rerouting_options - a
-    # shocked supplier keeps its retained (1 - severity) share rather than
-    # being excluded outright.
+    ## Find candidate suppliers from the remaining countries
+    # From the countries in all_edges (excluding shocked country) save the total export value and qty
     export_value_by_supplier: dict[str, float] = defaultdict(float)
     export_qty_by_supplier: dict[str, float] = defaultdict(float)
     for _, target, data in all_edges:
-        retained = 1 - shocks.get(target, 0.0)
-        if retained <= 0:
+        if target in shocks:
             continue
-        export_value_by_supplier[target] += (data.get("trade_value_usd", 0) or 0) * retained
+        export_value_by_supplier[target] += data.get("trade_value_usd", 0) or 0
         qty = data.get("trade_qty_kg")
         if qty == qty:  # filters NaN
-            export_qty_by_supplier[target] += qty * retained
+            export_qty_by_supplier[target] += qty
 
+    # Calculate candidate country's avg_unit_price and excess supply available
     avg_unit_price: dict[str, float] = {}
     supply: dict[str, float] = {}
     for supplier, total_value in export_value_by_supplier.items():
@@ -161,17 +119,16 @@ def build_reroute_problem(
         avg_unit_price[supplier] = total_value / total_qty
         supply[supplier] = total_value * capacity_multiplier
 
+    # Pull tariff data for existing relationships
     existing_tariffs = {
         (u, v): d.get("estimated_tariff_pct")
         for u, v, d in all_edges
         if d.get("estimated_tariff_pct") == d.get("estimated_tariff_pct")
     }
 
-    # Demand: aggregate displaced value per importer. Per-removed-supplier
-    # detail is kept in `displaced` for reporting only.
+    ## Demand: aggregate displaced value per importer from displaced_edges
     demand: dict[str, float] = defaultdict(float)
     displaced: list[dict[str, Any]] = []
-    self_backfill_exclusions: set[tuple[str, str]] = set()
     for importer, removed_supplier, data, severity in displaced_edges:
         full_value = data.get("trade_value_usd", 0) or 0
         displaced_value = full_value * severity
@@ -180,7 +137,6 @@ def build_reroute_problem(
             full_value / original_qty if original_qty == original_qty and original_qty else None
         )
         demand[importer] += displaced_value
-        self_backfill_exclusions.add((importer, removed_supplier))
         displaced.append({
             "importer": importer,
             "removed_supplier": removed_supplier,
@@ -191,15 +147,11 @@ def build_reroute_problem(
             if original_unit_price is not None else None,
         })
 
-    # Arcs: every (importer, candidate) pair with a price basis, excluding
-    # self-loops and a shocked supplier covering the exact relationship its
-    # own shock displaced (it can still serve *other* importers - see
-    # supply_chain_network.py's find_rerouting_options docstring).
+    ## Arcs: every (importer, candidate) pair with a price basis
+    # Factors tariffs, new supplier relationships, and shipping distances into cost of rerouting 
     arc_rows = []
     for importer in demand:
         for candidate, unit_price in avg_unit_price.items():
-            if candidate == importer or (importer, candidate) in self_backfill_exclusions:
-                continue
 
             if (importer, candidate) in existing_tariffs:
                 tariff_pct = existing_tariffs[(importer, candidate)]
